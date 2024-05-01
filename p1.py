@@ -7,3 +7,7 @@ Created on Wed May  1 11:07:18 2024
 
 def yes():
     print("JA")
+
+def no():
+    print("NEIN")
+
