@@ -1,0 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed May  1 11:07:18 2024
+
+@author: Erik
+"""
+
+def yes():
+    print("JA")
