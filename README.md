@@ -1,1 +1,1 @@
-# erste Ideen zum Konzept:
+# Erste Ideen zum Konzept:
