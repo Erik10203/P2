@@ -1,0 +1,1 @@
+# erste Ideen zum Konzept:
