@@ -1,0 +1,36 @@
+       
+        #Konstruktor (Thema 8 im Buch)
+        class Transaktion:
+            def __init__(self, nummer, betrag, kategorie, unterkategorie, datum):
+                self.nummer = nummer #Atribute erstellen. self.nummer = nummer  #erstellt ein Attribut Namens Nummer und weist ihm den Wert des Parameters Nummer zu.
+                self.betrag = betrag
+                self.kategorie = kategorie
+                self.unterkategorie = unterkategorie
+                self.datum = datum
+             
+        #Methoden
+            def getInfoTransaktion:
+                return str(self.nummer) + str(self.betrag) + self.kategorie + self.unterkategorie + str(self.datum)
+            
+            def getNummer:
+                return self.nummer
+            
+            def getBetrag:
+                return self.betrag
+            
+            def getKategorie:
+                return self.kategorie
+            
+            def getUnterkategorie:
+                return self.unterkategorie
+            
+            def getDatum:
+                return self.datum
+            
+            
+            
+           def neueTransaktion:     #User kann neue Info hinzufügen mit .append
+
+           def neueKategorie:
+
+           def neueUnterkategorie:
