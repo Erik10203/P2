@@ -1,36 +1,83 @@
        
-        #Konstruktor (Thema 8 im Buch)
-        class Transaktion:
-            def __init__(self, nummer, betrag, kategorie, unterkategorie, datum):
-                self.nummer = nummer #Atribute erstellen. self.nummer = nummer  #erstellt ein Attribut Namens Nummer und weist ihm den Wert des Parameters Nummer zu.
-                self.betrag = betrag
-                self.kategorie = kategorie
-                self.unterkategorie = unterkategorie
-                self.datum = datum
-             
-        #Methoden
-            def getInfoTransaktion:
-                return str(self.nummer) + str(self.betrag) + self.kategorie + self.unterkategorie + str(self.datum)
-            
-            def getNummer:
-                return self.nummer
-            
-            def getBetrag:
-                return self.betrag
-            
-            def getKategorie:
-                return self.kategorie
-            
-            def getUnterkategorie:
-                return self.unterkategorie
-            
-            def getDatum:
-                return self.datum
-            
-            
-            
-           def neueTransaktion:     #User kann neue Info hinzufügen mit .append
+     transaktionsliste = []
+kategorienliste = []
+unterkaterkategorienliste = []
+datumliste = []
+betragliste = []
 
-           def neueKategorie:
+class Transaktion:
+    def __init__(self, nummer, betrag, kategorie, unterkategorie, datum):
+        self.nummer = nummer
+        self.betrag = betrag
+        self.kategorie = kategorie
+        self.unterkategorie = unterkategorie
+        self.datum = datum
+        
+    def getInfoTransaktion(self):
+        return str(self.nummer) + str(self.betrag) + self.kategorie + self.unterkategorie + str(self.datum)
+    
+    def getNummer(self):
+        return self.nummer   
+    
+    def getBetrag(self):
+        return self.betrag   
+    
+    def getKategorie(self):
+        return self.kategorie  
+    
+    def getUnterkategorie(self):
+        return self.unterkategorie 
+    
+    def getDatum(self):
+        return self.datum    
 
-           def neueUnterkategorie:
+transaktion01 = Transaktion(1, 45, "Ausgabe", "Lebensmittel", 12022024)
+transaktion02 = Transaktion(2, 23, "Ausgabe", "Koks", 15022024)
+transaktion03 = Transaktion(3, 28, "Ausgabe", "Handy", 16022024)
+transaktion04 = Transaktion(4, 15, "Ausgabe", "Puff", 20022024)
+transaktion05 = Transaktion(5, 2000, "Einnahme", "Puff", 20022024)
+#die Transaktionen können über input vom Benutzer eingeführt werden --> neue Aufgabe
+
+transaktionsliste.append(transaktion01)
+transaktionsliste.append(transaktion02)
+transaktionsliste.append(transaktion03)
+transaktionsliste.append(transaktion04)
+transaktionsliste.append(transaktion05)
+
+for transaktion in transaktionsliste:
+    print(transaktion.getBetrag())
+
+#Kontostand etc.
+Kontostand = 0
+Ausgaben = 0
+Einnahmen = 0
+
+for transaktion in transaktionsliste:
+    if transaktion.getKategorie() == "Ausgabe":
+        Kontostand -= transaktion.getBetrag()
+    elif transaktion.getKategorie() == "Einnahme":
+        Kontostand += transaktion.getBetrag()
+    else:
+        print("Fehler bei der Eingabe der Transaktion")
+
+for transaktion in transaktionsliste:
+    if transaktion.getKategorie() == "Ausgabe":
+        Ausgaben += transaktion.getBetrag()
+    else:
+        continue
+
+for transaktion in transaktionsliste:
+    if transaktion.getKategorie() == "Einnahme":
+        Einnahmen += transaktion.getBetrag()
+    else:
+        continue
+
+print("Kontostand beträgt:", Kontostand)
+print("Ausgaben betragen:", Ausgaben)
+print("Einnahmen betragen:", Einnahmen)
+
+
+
+Fragen an PO:
+Was sind Kategorien und Unterkategorien? Sind damit beispielsweise Ausgaben und Lebensmittel gemeint? Oder eher Lebensmittel und Obst?
+
