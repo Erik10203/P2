@@ -1,0 +1,30 @@
+def anzeigen_listen(listen):
+    if not listen:
+        print("Nix da.")
+        return
+    for liste_name in listen.keys(): #.keys musste ich auch erstmal finden, arbeitet mit dictionaries
+        print(f"Liste: {liste_name}")
+        
+def hinzufuegen_liste(listen):
+    liste_name = input("Namen der neuen Liste eingeben: ")
+    if liste_name in listen:
+        print("Gibts schon")
+    else:
+        listen[liste_name] = []
+        print(f"Liste '{liste_name}' wurde erstellt.")
+        
+        
+listen = {}
+
+while True:
+    print("1. Listen anzeigen")
+    print("2. Neue Liste")
+    
+    auswahl = input("Entscheid dich: ")     
+    if auswahl == '1':
+        anzeigen_listen(listen)
+    elif auswahl == '2':
+            hinzufuegen_liste(listen)
+    else:
+        break
+        
