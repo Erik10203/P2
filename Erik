@@ -2,7 +2,7 @@ def anzeigen(listen):
     if not listen:
         print("Nix da.")
         return
-    for lname in listen.keys(): #.keys musste ich auch erstmal finden, arbeitet mit dictionaries
+    for lname in listen.keys(): 
         print(f"Liste: {lname}")
         
 def hinzufuegen(listen):
