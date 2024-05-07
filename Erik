@@ -25,6 +25,6 @@ while True:
         anzeigen(listen)
     elif auswahl == '2':
             hinzufuegen(listen)
-    else:
+    elif auswahl == '3':
         break
         
