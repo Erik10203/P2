@@ -1,13 +1,16 @@
-transaktionszähler = 5
+
 transaktionsliste = []
 
 class Transaktion:
     nummerzähler = 5
-    def __init__(self, betrag, kategorie, unterkategorie, datum):
+    def __init__(self, betrag, unterkategorie, datum):
+        if betrag == 0:
+            print("Wenn du nichts buchen willst dann lass es")
+            return
         Transaktion.nummerzähler += 1
         self.nummer = Transaktion.nummerzähler
-        self.betrag = betrag
-        self.kategorie = kategorie
+        self.betrag = betrag 
+        self.kategorie = "Einnahme" if betrag > 0 else "Ausgabe"
         self.unterkategorie = unterkategorie
         self.datum = datum
         
@@ -15,12 +18,11 @@ class Transaktion:
     def neue_transaktion(cls):
         while True:
             try:
-                betrag = float(input("Betrag: "))
-                kategorie = input("Kategorie (Ausgabe/Einnahme): ") #kann durch +/- bei betrag geschaut werden muss noch
-                unterkategorie = input("Unterkategorie: ")
+                betrag = float(input("Betrag (+/-): "))
+                unterkategorie = input("Woher kommt das Geld?: ") if betrag > 0 else input("Für was hast du das Geld ausgegeben?: ")
                 datum = int(input("Datum (TTMMJJJJ): "))
                  
-                neue_transaktion = cls(betrag, kategorie, unterkategorie, datum)
+                neue_transaktion = cls(betrag, unterkategorie, datum)
                 transaktionsliste.append(neue_transaktion)
                 print(f"Transaktion {neue_transaktion.nummer} hinzugefügt.")
                  
@@ -32,6 +34,7 @@ class Transaktion:
             except Exception as e:
                 print(f"Falsche Eingabe: {e}")
                 continue
+             
              
     #def anzeigen_transaktionen
     
@@ -55,11 +58,11 @@ class Transaktion:
 
 
 
-transaktion01 = Transaktion(45, "Ausgabe", "Lebensmittel", 12022024)
-transaktion02 = Transaktion(23, "Ausgabe", "Lebensmittel", 15022024)
-transaktion03 = Transaktion(28, "Ausgabe", "Handy", 16022024)
-transaktion04 = Transaktion(15, "Ausgabe", "Puff", 20022024)
-transaktion05 = Transaktion(2000, "Einnahme", "Puff", 20022024)
+transaktion01 = Transaktion(-45, "Lebensmittel", 12022024)
+transaktion02 = Transaktion(-23, "Lebensmittel", 15022024)
+transaktion03 = Transaktion(-28, "Handy", 16022024)
+transaktion04 = Transaktion(-15, "Puff", 20022024)
+transaktion05 = Transaktion(2000, "Puff", 20022024)
 
 
 transaktionsliste.append(transaktion01)
