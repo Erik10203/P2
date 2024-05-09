@@ -1,3 +1,4 @@
+transaktionszähler = 5
 transaktionsliste = []
 
 class Transaktion:
@@ -32,4 +33,109 @@ class Transaktion:
                 print(f"Falsche Eingabe: {e}")
                 continue
              
+    #def anzeigen_transaktionen
+    
+    def getInfoTransaktion(self):
+        return str(self.nummer) + str(self.betrag) + self.kategorie + self.unterkategorie + str(self.datum)
+    
+    def getNummer(self):
+        return self.nummer   
+    
+    def getBetrag(self):
+        return self.betrag   
+    
+    def getKategorie(self):
+        return self.kategorie  
+    
+    def getUnterkategorie(self):
+        return self.unterkategorie 
+    
+    def getDatum(self):
+        return self.datum    
+
+
+
+transaktion01 = Transaktion(45, "Ausgabe", "Lebensmittel", 12022024)
+transaktion02 = Transaktion(23, "Ausgabe", "Lebensmittel", 15022024)
+transaktion03 = Transaktion(28, "Ausgabe", "Handy", 16022024)
+transaktion04 = Transaktion(15, "Ausgabe", "Puff", 20022024)
+transaktion05 = Transaktion(2000, "Einnahme", "Puff", 20022024)
+
+
+transaktionsliste.append(transaktion01)
+transaktionsliste.append(transaktion02)
+transaktionsliste.append(transaktion03)
+transaktionsliste.append(transaktion04)
+transaktionsliste.append(transaktion05)
+
+#for transaktion in transaktionsliste:
+    #print(transaktion.getBetrag())
+
+#Kontostand, Ausgaben, Einnahmen etc.
+Kontostand = 0
+Ausgaben = 0
+Einnahmen = 0
+
 Transaktion.neue_transaktion()
+
+for transaktion in transaktionsliste:
+    if transaktion.getKategorie() == "Ausgabe":
+        Kontostand -= transaktion.getBetrag()
+    elif transaktion.getKategorie() == "Einnahme":
+        Kontostand += transaktion.getBetrag()
+    else:
+        print("Fehler bei der Eingabe der Transaktion")
+
+for transaktion in transaktionsliste:
+    if transaktion.getKategorie() == "Ausgabe":
+        Ausgaben += transaktion.getBetrag()
+    else:
+        continue
+
+for transaktion in transaktionsliste:
+    if transaktion.getKategorie() == "Einnahme":
+        Einnahmen += transaktion.getBetrag()
+    else:
+        continue
+
+print("")
+print("Kontostand beträgt:", Kontostand)
+print("")
+print("Ausgaben betragen:", Ausgaben)
+print("")
+print("Einnahmen betragen:", Einnahmen)
+print("")
+
+#Kategorien mit Umsatz
+unterkategorieliste = []
+
+for transaktion in transaktionsliste:
+    if transaktion.getKategorie() == "Ausgabe":
+        unterkategorieliste.append(transaktion.getUnterkategorie())
+    else:
+        continue
+eindeutige_unterkategorienliste = list(set(unterkategorieliste))
+
+# Funktion zur Berechnung der Ausgaben für eine bestimmte Unterkategorie
+def ausgaben_fuer_unterkategorie(unterkategorie):
+    summe = 0
+    for transaktion in transaktionsliste:
+        if transaktion.getKategorie() == "Ausgabe" and transaktion.getUnterkategorie() == unterkategorie:
+            summe += transaktion.getBetrag()
+    return summe
+for unterkategorie in eindeutige_unterkategorienliste:
+    betrag = ausgaben_fuer_unterkategorie(unterkategorie)
+    print("Ausgaben für", unterkategorie, "betragen:", betrag)
+    print("")
+    
+    
+#print (eindeutige_unterkategorienliste)
+
+#Umsatz/Kontoauszug
+for transaktion in transaktionsliste:
+    if transaktion.getKategorie() == "Ausgabe":
+         print(-1*transaktion.getBetrag())
+         print("")
+    else:
+        print(transaktion.getBetrag())
+        print("")
