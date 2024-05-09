@@ -1,9 +1,4 @@
-       
-     transaktionsliste = []
-kategorienliste = []
-unterkaterkategorienliste = []
-datumliste = []
-betragliste = []
+transaktionsliste = []
 
 class Transaktion:
     def __init__(self, nummer, betrag, kategorie, unterkategorie, datum):
@@ -32,7 +27,7 @@ class Transaktion:
         return self.datum    
 
 transaktion01 = Transaktion(1, 45, "Ausgabe", "Lebensmittel", 12022024)
-transaktion02 = Transaktion(2, 23, "Ausgabe", "Koks", 15022024)
+transaktion02 = Transaktion(2, 23, "Ausgabe", "Lebensmittel", 15022024)
 transaktion03 = Transaktion(3, 28, "Ausgabe", "Handy", 16022024)
 transaktion04 = Transaktion(4, 15, "Ausgabe", "Puff", 20022024)
 transaktion05 = Transaktion(5, 2000, "Einnahme", "Puff", 20022024)
@@ -44,10 +39,10 @@ transaktionsliste.append(transaktion03)
 transaktionsliste.append(transaktion04)
 transaktionsliste.append(transaktion05)
 
-for transaktion in transaktionsliste:
-    print(transaktion.getBetrag())
+#for transaktion in transaktionsliste:
+    #print(transaktion.getBetrag())
 
-#Kontostand etc.
+#Kontostand, Ausgaben, Einnahmen etc.
 Kontostand = 0
 Ausgaben = 0
 Einnahmen = 0
@@ -76,8 +71,33 @@ print("Kontostand beträgt:", Kontostand)
 print("Ausgaben betragen:", Ausgaben)
 print("Einnahmen betragen:", Einnahmen)
 
+#Kategorien mit Umsatz
+unterkategorieliste = []
 
+for transaktion in transaktionsliste:
+    if transaktion.getKategorie() == "Ausgabe":
+        unterkategorieliste.append(transaktion.getUnterkategorie())
+    else:
+        continue
+eindeutige_unterkategorienliste = list(set(unterkategorieliste))
 
-Fragen an PO:
-Was sind Kategorien und Unterkategorien? Sind damit beispielsweise Ausgaben und Lebensmittel gemeint? Oder eher Lebensmittel und Obst?
+# Funktion zur Berechnung der Ausgaben für eine bestimmte Unterkategorie
+def ausgaben_fuer_unterkategorie(unterkategorie):
+    summe = 0
+    for transaktion in transaktionsliste:
+        if transaktion.getKategorie() == "Ausgabe" and transaktion.getUnterkategorie() == unterkategorie:
+            summe += transaktion.getBetrag()
+    return summe
+for unterkategorie in eindeutige_unterkategorienliste:
+    betrag = ausgaben_fuer_unterkategorie(unterkategorie)
+    print("Ausgaben für", unterkategorie, "betragen:", betrag)
+    
+    
+#print (eindeutige_unterkategorienliste)
 
+#Umsatz/Kontoauszug
+for transaktion in transaktionsliste:
+    if transaktion.getKategorie() == "Ausgabe":
+         print(-1*transaktion.getBetrag())
+    else:
+        print(transaktion.getBetrag())
