@@ -1,4 +1,3 @@
-
 transaktionsliste = []
 
 class Transaktion:
@@ -83,7 +82,7 @@ Transaktion.neue_transaktion()
 
 for transaktion in transaktionsliste:
     if transaktion.getKategorie() == "Ausgabe":
-        Kontostand -= transaktion.getBetrag()
+        Kontostand += transaktion.getBetrag()
     elif transaktion.getKategorie() == "Einnahme":
         Kontostand += transaktion.getBetrag()
     else:
