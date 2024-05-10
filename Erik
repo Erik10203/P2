@@ -136,7 +136,7 @@ for unterkategorie in eindeutige_unterkategorienliste:
 #Umsatz/Kontoauszug
 for transaktion in transaktionsliste:
     if transaktion.getKategorie() == "Ausgabe":
-         print(-1*transaktion.getBetrag())
+         print(transaktion.getBetrag())
          print("")
     else:
         print(transaktion.getBetrag())
