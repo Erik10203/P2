@@ -16,14 +16,14 @@
 ###################################################### Menü
 
 def menu_anzeigen():
-    print("\n*******************************")
+    print("\n-------------------------------------------")
     print("Menü:")
     print("1. Neue Transaktion hinzufügen")
     print("2. Transaktion löschen")
     print("3. Transaktionen anzeigen")
     print("4. Budget planen")
     print("5. Programm beenden")
-    print("*******************************")
+    print("-------------------------------------------")
 
 
 ################################# dazu muss noch Code geschrieben werden
