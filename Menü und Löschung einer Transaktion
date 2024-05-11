@@ -1,0 +1,61 @@
+
+ ###################################################### Transaktion löschen           
+    @classmethod							
+    def delete_transaktion(cls, nummer): 
+        for transaktion in transaktionsliste:
+            if transaktion.nummer == nummer:
+                transaktionsliste.remove(transaktion)
+                print(f"Transaktion gelöscht.")
+                return
+        print(f"Transaktion nicht gefunden.")
+
+######################################################
+
+
+
+###################################################### Menü
+
+def menu_anzeigen():
+    print("\n*******************************")
+    print("Menü:")
+    print("1. Neue Transaktion hinzufügen")
+    print("2. Transaktion löschen")
+    print("3. Transaktionen anzeigen")
+    print("4. Budget planen")
+    print("5. Programm beenden")
+    print("*******************************")
+
+
+################################# dazu muss noch Code geschrieben werden
+#def budget_planen():
+#################################    
+
+def transaktionen_anzeigen():
+    print("\nListe von Transaktionen:")
+    for transaktion in transaktionsliste:
+        print(transaktion.getInfoTransaktion())
+
+def programm_starten():
+    while True:
+        menu_anzeigen()
+        auswahl = input("Wähl mal eine Option: ")
+
+        if auswahl == "1":
+            Transaktion.neue_transaktion()
+        elif auswahl == "2":
+            nummer = int(input("Gib bitte die Nummer einer Transaktion: "))
+            Transaktion.delete_transaktion(nummer)
+        elif auswahl == "3":
+            transaktionen_anzeigen()
+        elif auswahl == "4":
+            budget_setzen()
+        elif auswahl == "5":
+            print("Tschüss. Alles Gute.")
+            break
+        else:
+            print("Eingabe muss zwischen 1 und 5 sein.")
+
+budget = 0 #beim Start
+transaktionsliste = []
+
+programm_starten()
