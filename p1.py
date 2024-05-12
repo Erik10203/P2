@@ -103,6 +103,11 @@ class Transaktion:
     def getDatum(self):
         return self.datum    
 
+budget = 0 #beim Start
+transaktionsliste = []
+
+Transaktion.programm_starten()
+
 # Beispieltransaktionen
 transaktion01 = Transaktion(-45, "Lebensmittel", d.datetime.strptime("12022024", "%d%m%Y"))
 transaktion02 = Transaktion(-23, "Lebensmittel", d.datetime.strptime("15022024", "%d%m%Y"))
