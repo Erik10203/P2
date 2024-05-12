@@ -47,12 +47,44 @@ class Transaktion:
         for transaktion in transaktionsliste:
             if transaktion.getNummer() == loeschauswahl:
                 transaktionsliste.remove(transaktion)
-                print(f"Transaktion {loeschauswahl} wurde gelöscht.")
+                print(f"Transaktion {loeschauswahl} gelöscht.")
                 break
         else:
             print("Transaktion nicht gefunden.")
+    a = 0
+    def budget_setzen():
+        a = 0
         
-    
+    def menu_anzeigen():
+        print("\n-------------------------------------------")
+        print("Menü:")
+        print("1. Neue Transaktion hinzufügen")
+        print("2. Transaktion löschen")
+        print("3. Transaktionen anzeigen")
+        print("4. Budget planen")
+        print("5. Programm beenden")
+        print("-------------------------------------------")
+        
+    def programm_starten():
+        while True:
+            Transaktion.menu_anzeigen()
+            auswahl = input("Wähl mal eine Option: ")
+
+            if auswahl == "1":
+                Transaktion.neue_transaktion()
+            elif auswahl == "2":
+                Transaktion.loeschen_transaktionen()
+            elif auswahl == "3":
+                Transaktion.anzeigen_transaktionen()
+            elif auswahl == "4":
+                Transaktion.budget_setzen()
+            elif auswahl == "5":
+                print("Tschüss. Alles Gute.")
+                break
+            else:
+                print("Eingabe muss zwischen 1 und 5 sein.")
+        
+  
     def getInfoTransaktion(self):
         return str(self.nummer) + str(self.betrag) + self.kategorie + self.unterkategorie + str(self.datum)
     
@@ -84,51 +116,32 @@ transaktionsliste.append(transaktion03)
 transaktionsliste.append(transaktion04)
 transaktionsliste.append(transaktion05)
 
-# Neue Transaktionen hinzufügen
-#Transaktion.neue_transaktion()
-while True:
-    print ("1. Anzeigen")
-    print ("2. Hinzu")
-    print ("3. Löschen")
-    print ("4. Stopp")
-    
-    auswahl = int(input("Was willst? "))
-    if auswahl == 1:
-        Transaktion.anzeigen_transaktionen()
-        
-    elif auswahl == 2:
-        Transaktion.neue_transaktion()
-        
-    elif auswahl == 3: 
-        Transaktion.loeschen_transaktionen()
-        
-    elif auswahl == 4:
-        False 
-# Kontostand, Ausgaben, Einnahmen etc. berechnen
+
+        # Kontostand, Ausgaben, Einnahmen etc. berechnen
 Kontostand = 0
 Ausgaben = 0
 Einnahmen = 0
-
+    
 for transaktion in transaktionsliste:
     if transaktion.getKategorie() == "Ausgabe":
         Ausgaben += transaktion.getBetrag()
     elif transaktion.getKategorie() == "Einnahme":
         Einnahmen += transaktion.getBetrag()
-
 Kontostand = Einnahmen + Ausgaben
 
 print("\nKontostand beträgt:", Kontostand)
 print("\nAusgaben betragen:", Ausgaben)
 print("\nEinnahmen betragen:", Einnahmen)
 
-# Ausgaben pro Unterkategorie berechnen
+    # Ausgaben pro Unterkategorie berechnen
 unterkategorieliste = [transaktion.getUnterkategorie() for transaktion in transaktionsliste if transaktion.getKategorie() == "Ausgabe"]
 eindeutige_unterkategorienliste = list(set(unterkategorieliste))
 
 def ausgaben_fuer_unterkategorie(unterkategorie):
-    summe = sum(transaktion.getBetrag() for transaktion in transaktionsliste if transaktion.getKategorie() == "Ausgabe" and transaktion.getUnterkategorie() == unterkategorie)
-    return summe
-
+   summe = sum(transaktion.getBetrag() for transaktion in transaktionsliste if transaktion.getKategorie() == "Ausgabe" and transaktion.getUnterkategorie() == unterkategorie)
+   return summe
+  
 for unterkategorie in eindeutige_unterkategorienliste:
     betrag = ausgaben_fuer_unterkategorie(unterkategorie)
     print("\nAusgaben für", unterkategorie, "betragen:", betrag)
+  
