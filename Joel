@@ -101,3 +101,18 @@ for transaktion in transaktionsliste:
          print(-1*transaktion.getBetrag())
     else:
         print(transaktion.getBetrag())
+
+#Zeitraum einnahmen und Ausgaben vergleichen:
+
+def einnahmen_ausgaben_imZeitraum:
+    startdatum_str = input("Startdatum des Zeitraums (TTMMJJJJ): ")
+    enddatum_str = input("Enddatum des Zeitraums (TTMMJJJJ): ")
+    startdatum = d.datetime.strptime(startdatum_str, "%d%m%Y")
+    enddatum = d.datetime.strptime(enddatum_str, "%d%m%Y")
+    
+    for transaktion in transaktionen_im_zeitraum:
+    if transaktion.getKategorie() == "Ausgabe":
+        Ausgaben += transaktion.getBetrag()
+
+
+
