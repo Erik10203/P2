@@ -62,7 +62,8 @@ class Transaktion:
         print("2. Transaktion löschen")
         print("3. Transaktionen anzeigen")
         print("4. Budget planen")
-        print("5. Programm beenden")
+        print("5. Konten anzeigen")
+        print("6. Programm beenden")
         print("-------------------------------------------")
         
     def programm_starten():
@@ -79,6 +80,8 @@ class Transaktion:
             elif auswahl == "4":
                 Transaktion.budget_setzen()
             elif auswahl == "5":
+                ausgaben_fuer_unterkategorie()
+            elif auswahl == "6":
                 print("Tschüss. Alles Gute.")
                 break
             else:
@@ -106,7 +109,7 @@ class Transaktion:
 budget = 0 #beim Start
 transaktionsliste = []
 
-Transaktion.programm_starten()
+
 
 # Beispieltransaktionen
 transaktion01 = Transaktion(-45, "Lebensmittel", d.datetime.strptime("12022024", "%d%m%Y"))
@@ -149,4 +152,7 @@ def ausgaben_fuer_unterkategorie(unterkategorie):
 for unterkategorie in eindeutige_unterkategorienliste:
     betrag = ausgaben_fuer_unterkategorie(unterkategorie)
     print("\nAusgaben für", unterkategorie, "betragen:", betrag)
+  
+
+Transaktion.programm_starten()
   
