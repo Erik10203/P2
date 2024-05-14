@@ -1,9 +1,11 @@
+
 import datetime as d
 
 transaktionsliste = []
+gefilterte_transaktionen =  [ ]
 
 class Transaktion:
-    nummerzähler = 5
+    nummerzähler = 0
     def __init__(self, betrag, unterkategorie, datum):
         if betrag == 0:
             print("Wenn du nichts buchen willst dann lass es")
@@ -15,6 +17,25 @@ class Transaktion:
         self.unterkategorie = unterkategorie
         self.datum = datum
         
+    def getInfoTransaktion(self):
+        return str(self.nummer) + str(self.betrag) + self.kategorie + self.unterkategorie + str(self.datum)
+
+    def getNummer(self):
+        return self.nummer   
+
+    def getBetrag(self):
+        return self.betrag   
+
+    def getKategorie(self):
+        return self.kategorie  
+
+    def getUnterkategorie(self):
+        return self.unterkategorie 
+
+    def getDatum(self):
+        return self.datum    
+        
+
     @classmethod
     def neue_transaktion(cls):
         while True:
@@ -36,27 +57,113 @@ class Transaktion:
             except Exception as e:
                 print(f"Falsche Eingabe: {e}")
                 continue
-             
-             
-    #def anzeigen_transaktionen
+
     
-    def getInfoTransaktion(self):
-        return str(self.nummer) + str(self.betrag) + self.kategorie + self.unterkategorie + str(self.datum)
+def anzeigen_transaktionen():
+    [print(f"Transaktionsnummer: {transaktion.getNummer()}, Datum: {transaktion.getDatum().strftime('%d.%m.%Y')}, Betrag: {transaktion.getBetrag()} €, Kategorie: {transaktion.getKategorie()}, Unterkategorie: {transaktion.getUnterkategorie()}") for transaktion in transaktionsliste]
     
-    def getNummer(self):
-        return self.nummer   
+def anzeigen_transaktionen_filter():
+    [print(f"Transaktionsnummer: {transaktion.getNummer()}, Datum: {transaktion.getDatum().strftime('%d.%m.%Y')}, Betrag: {transaktion.getBetrag()} €, Kategorie: {transaktion.getKategorie()}, Unterkategorie: {transaktion.getUnterkategorie()}") for transaktion in gefilterte_transaktionen]
+
+def loeschen_transaktionen():
+    anzeigen_transaktionen()
+    loeschauswahl = int(input("Gib die Transaktionsnummer der Transaktion ein, die du löschen möchtest: "))
+    for transaktion in transaktionsliste:
+        if transaktion.getNummer() == loeschauswahl:
+            transaktionsliste.remove(transaktion)
+            print(f"Transaktion {loeschauswahl} gelöscht.")
+            break
+    else:
+        print("Transaktion nicht gefunden.")
+a = 0
+def budget_setzen():
+    a = 0
     
-    def getBetrag(self):
-        return self.betrag   
+def menu_anzeigen():
+    print("\n-------------------------------------------")
+    print("Menü:")
+    print("1. Neue Transaktion hinzufügen")
+    print("2. Transaktion löschen")
+    print("3. Transaktionen anzeigen")
+    print("4. Budget planen")
+    print("5. Konten anzeigen")
+    print("6. Zeitraumfilter")
+    print("7. Programm beenden")
+    print("-------------------------------------------")
     
-    def getKategorie(self):
-        return self.kategorie  
+ 
+
+def Kontostand_Umsatz():
+    Kontostand = 0
+    Ausgaben = 0
+    Einnahmen = 0
+        
+    for transaktion in transaktionsliste:
+        if transaktion.getKategorie() == "Ausgabe":
+            Ausgaben += transaktion.getBetrag()
+        elif transaktion.getKategorie() == "Einnahme":
+            Einnahmen += transaktion.getBetrag()
+    Kontostand = Einnahmen + Ausgaben
     
-    def getUnterkategorie(self):
-        return self.unterkategorie 
+    print("\nKontostand beträgt:", Kontostand)
+    print("\nAusgaben betragen:", Ausgaben)
+    print("\nEinnahmen betragen:", Einnahmen)    
+
+def ausgaben_fuer_unterkategorie(unterkategorie):
+           summe = sum(transaktion.getBetrag() for transaktion in transaktionsliste if transaktion.getKategorie() == "Ausgabe" and transaktion.getUnterkategorie() == unterkategorie)
+           return summe
+   
+def unterkategorie ():
+    unterkategorieliste = [transaktion.getUnterkategorie() for transaktion in transaktionsliste if transaktion.getKategorie() == "Ausgabe"]
+    eindeutige_unterkategorienliste = list(set(unterkategorieliste))
     
-    def getDatum(self):
-        return self.datum    
+    for unterkategorie in eindeutige_unterkategorienliste:
+        betrag = ausgaben_fuer_unterkategorie(unterkategorie)
+        print("\nAusgaben für", unterkategorie, "betragen:", betrag)
+
+
+    
+def Zeitraumfilter():
+    startdatum_str = input("Startdatum des Zeitraums (TTMMJJJJ): ")
+    enddatum_str = input("Enddatum des Zeitraums (TTMMJJJJ): ")
+    startdatum = d.datetime.strptime(startdatum_str, "%d%m%Y")
+    enddatum = d.datetime.strptime(enddatum_str, "%d%m%Y")
+    
+    gefilterte_transaktionen =  [ ]
+    
+    for transaktion in transaktionsliste:
+        if startdatum <= transaktion.datum <= enddatum:
+            gefilterte_transaktionen.append(transaktion)
+    return gefilterte_transaktionen
+    print(anzeigen_transaktionen_filter())
+
+def programm_starten():
+    while True:
+        menu_anzeigen()
+        auswahl = input("Wähl mal eine Option: ")
+
+        if auswahl == "1":
+            Transaktion.neue_transaktion()
+        elif auswahl == "2":
+            loeschen_transaktionen()
+        elif auswahl == "3":
+            anzeigen_transaktionen()
+        elif auswahl == "4":
+            budget_setzen()
+        elif auswahl == "5":
+            print (transaktionsliste())
+            print (eindeutige_unterkategorienliste())
+            Kontostand_Umsatz()
+            unterkategorie()
+        elif auswahl == "6":
+            Zeitraumfilter()
+        elif auswahl == "7":
+            print("Tschüss. Alles Gute.")
+            break
+        else:
+            print("Eingabe muss zwischen 1 und 5 sein.")
+            
+budget = 0 #beim Start
 
 # Beispieltransaktionen
 transaktion01 = Transaktion(-45, "Lebensmittel", d.datetime.strptime("12022024", "%d%m%Y"))
@@ -71,34 +178,6 @@ transaktionsliste.append(transaktion03)
 transaktionsliste.append(transaktion04)
 transaktionsliste.append(transaktion05)
 
-# Neue Transaktionen hinzufügen
-Transaktion.neue_transaktion()
 
-# Kontostand, Ausgaben, Einnahmen etc. berechnen
-Kontostand = 0
-Ausgaben = 0
-Einnahmen = 0
 
-for transaktion in transaktionsliste:
-    if transaktion.getKategorie() == "Ausgabe":
-        Ausgaben += transaktion.getBetrag()
-    elif transaktion.getKategorie() == "Einnahme":
-        Einnahmen += transaktion.getBetrag()
-
-Kontostand = Einnahmen + Ausgaben
-
-print("\nKontostand beträgt:", Kontostand)
-print("\nAusgaben betragen:", Ausgaben)
-print("\nEinnahmen betragen:", Einnahmen)
-
-# Ausgaben pro Unterkategorie berechnen
-unterkategorieliste = [transaktion.getUnterkategorie() for transaktion in transaktionsliste if transaktion.getKategorie() == "Ausgabe"]
-eindeutige_unterkategorienliste = list(set(unterkategorieliste))
-
-def ausgaben_fuer_unterkategorie(unterkategorie):
-    summe = sum(transaktion.getBetrag() for transaktion in transaktionsliste if transaktion.getKategorie() == "Ausgabe" and transaktion.getUnterkategorie() == unterkategorie)
-    return summe
-
-for unterkategorie in eindeutige_unterkategorienliste:
-    betrag = ausgaben_fuer_unterkategorie(unterkategorie)
-    print("\nAusgaben für", unterkategorie, "betragen:", betrag)
+programm_starten()
