@@ -1,128 +1,20 @@
-import datetime as d
-
-transaktionsliste = []
-
-class Transaktion:
-    nummerzähler = 5
-    def __init__(self, betrag, unterkategorie, datum):
-        if betrag == 0:
-            print("Wenn du nichts buchen willst dann lass es")
-            return
-        Transaktion.nummerzähler += 1
-        self.nummer = Transaktion.nummerzähler
-        self.betrag = betrag 
-        self.kategorie = "Einnahme" if betrag > 0 else "Ausgabe"
-        self.unterkategorie = unterkategorie
-        self.datum = datum
-        
-    @classmethod
-    def neue_transaktion(cls):
-        while True:
-            try:
-                betrag = float(input("Betrag (+/-): "))
-                unterkategorie = input("Woher kommt das Geld?: ") if betrag > 0 else input("Für was hast du das Geld ausgegeben?: ")
-                datum_str = input("Datum (TTMMJJJJ): ")
-                datum_obj = d.datetime.strptime(datum_str, "%d%m%Y")
-                 
-                neue_transaktion = cls(betrag, unterkategorie, datum_obj)
-                transaktionsliste.append(neue_transaktion)
-                print(f"Transaktion {neue_transaktion.nummer} hinzugefügt.")
-                 
-                wasnu = input("Weitere Transaktion hinzufügen? (Ja/Nein) ")
-                if wasnu.lower() != "ja":
-                    break
-                else:
-                    continue
-            except Exception as e:
-                print(f"Falsche Eingabe: {e}")
-                continue
-             
-             
-    #def anzeigen_transaktionen
-    
-    def getInfoTransaktion(self):
-        return str(self.nummer) + str(self.betrag) + self.kategorie + self.unterkategorie + str(self.datum)
-    
-    def getNummer(self):
-        return self.nummer   
-    
-    def getBetrag(self):
-        return self.betrag   
-    
-    def getKategorie(self):
-        return self.kategorie  
-    
-    def getUnterkategorie(self):
-        return self.unterkategorie 
-    
-    def getDatum(self):
-        return self.datum    
-
-# Beispieltransaktionen
-transaktion01 = Transaktion(-45, "Lebensmittel", d.datetime.strptime("12022024", "%d%m%Y"))
-transaktion02 = Transaktion(-23, "Lebensmittel", d.datetime.strptime("15022024", "%d%m%Y"))
-transaktion03 = Transaktion(-28, "Handy", d.datetime.strptime("16022024", "%d%m%Y"))
-transaktion04 = Transaktion(-15, "Puff", d.datetime.strptime("20022024", "%d%m%Y"))
-transaktion05 = Transaktion(2000, "Puff", d.datetime.strptime("20022024", "%d%m%Y"))
-
-transaktionsliste.append(transaktion01)
-transaktionsliste.append(transaktion02)
-transaktionsliste.append(transaktion03)
-transaktionsliste.append(transaktion04)
-transaktionsliste.append(transaktion05)
-
-# Neue Transaktionen hinzufügen
-Transaktion.neue_transaktion()
-
-# Kontostand, Ausgaben, Einnahmen etc. berechnen
-Kontostand = 0
-Ausgaben = 0
-Einnahmen = 0
-
-for transaktion in transaktionsliste:
-    if transaktion.getKategorie() == "Ausgabe":
-        Ausgaben += transaktion.getBetrag()
-    elif transaktion.getKategorie() == "Einnahme":
-        Einnahmen += transaktion.getBetrag()
-
-Kontostand = Einnahmen + Ausgaben
-
-print("\nKontostand beträgt:", Kontostand)
-print("\nAusgaben betragen:", Ausgaben)
-print("\nEinnahmen betragen:", Einnahmen)
-
-# Funktion zur Berechnung der Ausgaben für eine bestimmte Unterkategorie
-def ausgaben_fuer_unterkategorie(unterkategorie):
-    summe = 0
-    for transaktion in transaktionsliste:
-        if transaktion.getKategorie() == "Ausgabe" and transaktion.getUnterkategorie() == unterkategorie:
-            summe += transaktion.getBetrag()
-    return summe
-for unterkategorie in eindeutige_unterkategorienliste:
-    betrag = ausgaben_fuer_unterkategorie(unterkategorie)
-    print("Ausgaben für", unterkategorie, "betragen:", betrag)
-    
-    
-#print (eindeutige_unterkategorienliste)
-
-#Umsatz/Kontoauszug
-for transaktion in transaktionsliste:
-    if transaktion.getKategorie() == "Ausgabe":
-         print(-1*transaktion.getBetrag())
-    else:
-        print(transaktion.getBetrag())
-
-#Zeitraum einnahmen und Ausgaben vergleichen (erste Ideen):
-
-def einnahmen_ausgaben_imZeitraum:
+def Zeitraumfilter():
     startdatum_str = input("Startdatum des Zeitraums (TTMMJJJJ): ")
     enddatum_str = input("Enddatum des Zeitraums (TTMMJJJJ): ")
     startdatum = d.datetime.strptime(startdatum_str, "%d%m%Y")
     enddatum = d.datetime.strptime(enddatum_str, "%d%m%Y")
     
-    for transaktion in transaktionen_im_zeitraum:
-    if transaktion.getKategorie() == "Ausgabe":
-        Ausgaben += transaktion.getBetrag()
+    gefilterte_transaktionen =  [ ]
+    
+    for transaktion in transaktionsliste:
+        if startdatum <= transaktion.datum <= enddatum:
+            gefilterte_transaktionen.append(transaktion)
+    return gefilterte_transaktionen
+
+
+gefilterte_transaktionen = Zeitraumfilter()
+for transaktion in gefilterte_transaktionen:
+    print(transaktion.getInfoTransaktion())
 
 
 
