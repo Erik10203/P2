@@ -75,9 +75,9 @@ def loeschen_transaktionen():
             break
     else:
         print("Transaktion nicht gefunden.")
-a = 0
+
 def budget_setzen():
-    a = 0
+    pass
     
 def menu_anzeigen():
     print("\n-------------------------------------------")
@@ -94,6 +94,8 @@ def menu_anzeigen():
  
 
 def Kontostand_Umsatz():
+    
+    anzeigen_transaktionen()
     Kontostand = 0
     Ausgaben = 0
     Einnahmen = 0
@@ -116,6 +118,7 @@ def ausgaben_fuer_unterkategorie(unterkategorie):
 def unterkategorie ():
     unterkategorieliste = [transaktion.getUnterkategorie() for transaktion in transaktionsliste if transaktion.getKategorie() == "Ausgabe"]
     eindeutige_unterkategorienliste = list(set(unterkategorieliste))
+    #print (eindeutige_unterkategorienliste())
     
     for unterkategorie in eindeutige_unterkategorienliste:
         betrag = ausgaben_fuer_unterkategorie(unterkategorie)
@@ -151,8 +154,6 @@ def programm_starten():
         elif auswahl == "4":
             budget_setzen()
         elif auswahl == "5":
-            print (transaktionsliste())
-            print (eindeutige_unterkategorienliste())
             Kontostand_Umsatz()
             unterkategorie()
         elif auswahl == "6":
