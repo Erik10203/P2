@@ -5,29 +5,29 @@ Created on Wed May 15 10:01:26 2024
 @author: Erik
 """
 
-import datetime as d
+import datetime as d #Modul 
 
-transaktionsliste = []
+transaktionsliste = [] #leere Liste
 budgets = {}
 
 class Transaktion:
     nummerzähler = 0
 
-    def __init__(self, betrag, unterkategorie, datum):
+    def __init__(self, betrag, unterkategorie, datum): #Thema 5 im Buch Seite 56. def - Funktion 
         if betrag == 0:
             print("Wenn du nichts buchen willst dann lass es")
             return
         Transaktion.nummerzähler += 1
-        self.nummer = Transaktion.nummerzähler
+        self.nummer = Transaktion.nummerzähler #neue Attribute 
         self.betrag = betrag
         self.kategorie = "Einnahme" if betrag > 0 else "Ausgabe"
         self.unterkategorie = unterkategorie
         self.datum = datum
 
-    def getInfoTransaktion(self):
+    def getInfoTransaktion(self): #welche Info möchten wir zur Transaktion haben. Eine Reihe von Attribute
         return f"Nummer: {self.nummer}, Betrag: {self.betrag}, Kategorie: {self.kategorie}, Unterkategorie: {self.unterkategorie}, Datum: {self.datum.strftime('%d.%m.%Y')}"
 
-    def getNummer(self):
+    def getNummer(self): #Methode um Attribut zu bekommen
         return self.nummer
 
     def getBetrag(self):
@@ -47,16 +47,16 @@ class Transaktion:
         while True:
             try:
                 betrag = float(input("Betrag (+/-): "))
-                unterkategorie = input("Woher kommt das Geld?: ") if betrag > 0 else input("Für was hast du das Geld ausgegeben?: ")
+                unterkategorie = input("Woher kommt das Geld? (Kategorie): ") if betrag > 0 else input("Für was hast du das Geld ausgegeben?: ")
                 datum_str = input("Datum (TTMMJJJJ): ")   #Datum als String speichern
                 datum_obj = d.datetime.strptime(datum_str, "%d%m%Y")  #ins Datumsobjekt umgewandelt
 
                 neue_transaktion = cls(betrag, unterkategorie, datum_obj)
-                transaktionsliste.append(neue_transaktion)
+                transaktionsliste.append(neue_transaktion) #neue Transaktion in die Liste transaktionsliste hinzufügen
                 print(f"Transaktion {neue_transaktion.nummer} hinzugefügt.")
 
                 wasnu = input("Weitere Transaktion hinzufügen? (Ja/Nein) ")
-                if wasnu.lower() != "ja":
+                if wasnu.lower() != "ja":  #ob die eingegebene Antwort ja
                     break
             except Exception as e:
                 print(f"Falsche Eingabe: {e}")
