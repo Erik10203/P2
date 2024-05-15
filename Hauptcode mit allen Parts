@@ -1,5 +1,3 @@
-
-
 import datetime as d
 
 transaktionsliste = []
@@ -79,7 +77,6 @@ def loeschen_transaktionen():
     else:
         print("Transaktion nicht gefunden.")
 
-
 def budget_setzen():
     vorhandene_unterkategorien = Transaktion.vorhandene_unterkategorien()
     if not vorhandene_unterkategorien:
@@ -95,8 +92,6 @@ def budget_setzen():
         print(f"Das Budget für {kategorie} wurde auf {betrag} gesetzt.")
     except ValueError:
         print("Ungültiger Betrag")
-
-
 
 def check_budget():
     jahr = int(input("Gib das Jahr ein: ")) 
@@ -116,9 +111,6 @@ def check_budget():
     for unterkategorie, budget in budgets.items():
         spent = sum(tran.betrag for tran in transaktionsliste if tran.unterkategorie == unterkategorie and tran.datum.year == jahr and tran.datum.month == monat)
         print(f"{unterkategorie}: Budget: {budget}€, Ausgaben: {spent}€ für {jahr}-{monat}, {'Im Budget' if abs(spent)<= budget else 'Budget überschritten'}")
-
-
-
 
 def menu_anzeigen():
     print("\n-------------------------------------------")
@@ -222,8 +214,8 @@ budget = 0  # beim Start
 transaktion01 = Transaktion(-45, "Lebensmittel", d.datetime.strptime("12022024", "%d%m%Y"))
 transaktion02 = Transaktion(-23, "Lebensmittel", d.datetime.strptime("15022024", "%d%m%Y"))
 transaktion03 = Transaktion(-28, "Handy", d.datetime.strptime("16022024", "%d%m%Y"))
-transaktion04 = Transaktion(-15, "Puff", d.datetime.strptime("20022024", "%d%m%Y"))
-transaktion05 = Transaktion(2000, "Puff", d.datetime.strptime("20022024", "%d%m%Y"))
+transaktion04 = Transaktion(-15, "Restaurant", d.datetime.strptime("20022024", "%d%m%Y"))
+transaktion05 = Transaktion(2000, "Job", d.datetime.strptime("20022024", "%d%m%Y"))
 
 transaktionsliste.append(transaktion01)
 transaktionsliste.append(transaktion02)
