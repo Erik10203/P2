@@ -1,6 +1,14 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed May 15 10:01:26 2024
+
+@author: Erik
+"""
+
 import datetime as d
 
 transaktionsliste = []
+budgets = {}
 
 class Transaktion:
     nummerzähler = 0
@@ -52,6 +60,10 @@ class Transaktion:
                     break
             except Exception as e:
                 print(f"Falsche Eingabe: {e}")
+        
+    @classmethod
+    def vorhandene_unterkategorien(cls):
+        return set(transaktion.unterkategorie for transaktion in transaktionsliste)
 
 def anzeigen_transaktionen():
     for transaktion in transaktionsliste:
@@ -73,28 +85,42 @@ def loeschen_transaktionen():
         print("Transaktion nicht gefunden.")
 
 
-def budget_setzen(self, category, amount):
-    if category in self.categories["Ausgaben"]:
-        self.budgets[category] = amount
-        print(f"Budget für '{category}' gesetzt: {amount}€")
-    else:
-        print("Kategorie nicht gefunden. Stellen Sie sicher, dass es eine Ausgabenkategorie ist.")
+def budget_setzen():
+    vorhandene_unterkategorien = Transaktion.vorhandene_unterkategorien()
+    if not vorhandene_unterkategorien:
+        print("Gibt keine")
+        return
+    kategorie = input("Welche Kategorie?: ")
+    if kategorie not in vorhandene_unterkategorien:
+        print(f"Die Kategorie '{kategorie}' existiert nicht.")
+        return
+    try:
+        betrag = float(input(f"Welches Budget für {kategorie} setzen?: "))
+        budgets[kategorie] = betrag
+        print(f"Das Budget für {kategorie} wurde auf {betrag} gesetzt.")
+    except ValueError:
+        print("Ungültiger Betrag")
 
-def check_budget(self, jahr, monat):
-    total_expenses = 0
+
+
+def check_budget():
+    jahr = int(input("Gib das Jahr ein: ")) 
+    monat = int(input("Gib den Monat ein: "))
+    
     total_income = 0
-    for tran in self.transactions:
-        if tran["date"].year == jahr and tran["date"].month == monat:
-            if tran["type"] == "Einnahmen":
-                total_income += tran["amount"]
-            else:
-                total_expenses += tran["amount"]
+    total_expenses = 0
+    for tran in transaktionsliste:
+        if tran.datum.year == jahr and tran.datum.month == monat:
+            if tran.kategorie == "Einnahme":
+                total_income += tran.betrag
+            elif tran.kategorie == "Ausgabe":
+                total_expenses += tran.betrag
 
     print(f"Total Einnahmen: {total_income}€, Total Ausgaben: {total_expenses}€ für {jahr}-{monat}")
 
-    for category, budget in self.budgets.items():
-        spent = sum(tran["amount"] for tran in self.transactions if tran["category"] == category and tran["date"].year == jahr and tran["date"].month == monat)
-        print(f"{category}: Budget: {budget}€, Ausgaben: {spent}€ für {jahr}-{monat}, {'Im Budget' if spent <= budget else 'Budget überschritten'}")
+    for unterkategorie, budget in budgets.items():
+        spent = sum(tran.betrag for tran in transaktionsliste if tran.unterkategorie == unterkategorie and tran.datum.year == jahr and tran.datum.month == monat)
+        print(f"{unterkategorie}: Budget: {budget}€, Ausgaben: {spent}€ für {jahr}-{monat}, {'Im Budget' if abs(spent)<= budget else 'Budget überschritten'}")
 
 
 
@@ -106,9 +132,10 @@ def menu_anzeigen():
     print("2. Transaktion löschen")
     print("3. Transaktionen anzeigen")
     print("4. Budget planen")
-    print("5. Konten anzeigen")
-    print("6. Zeitraumfilter")
-    print("7. Programm beenden")
+    print("5. Budget checken")
+    print("6. Konten anzeigen")
+    print("7. Zeitraumfilter")
+    print("8. Programm beenden")
     print("-------------------------------------------")
 
 def Kontostand_Umsatz():
@@ -182,11 +209,13 @@ def programm_starten():
         elif auswahl == "4":
             budget_setzen()
         elif auswahl == "5":
+            check_budget()
+        elif auswahl == "6":
             Kontostand_Umsatz()
             unterkategorie(transaktionsliste)
-        elif auswahl == "6":
-            Zeitraumfilter()
         elif auswahl == "7":
+            Zeitraumfilter()
+        elif auswahl == "8":
             print("Tschüss. Alles Gute.")
             break
         else:
