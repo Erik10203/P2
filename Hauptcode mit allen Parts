@@ -42,7 +42,7 @@ class Transaktion:
     def getDatum(self):
         return self.datum
 
-    @classmethod
+    @classmethod #bezieht sich auf gesamte Klassedeshaltb cls anstatt self, ermöglicht zugriff auf Klasseneigenschaften und anderen Klassenelementen
     def neue_transaktion(cls):
         while True:
             try:
