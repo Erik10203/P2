@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed May 15 10:01:26 2024
+
+@author: Erik
+"""
+
 import datetime as d
 
 transaktionsliste = []
@@ -41,8 +48,8 @@ class Transaktion:
             try:
                 betrag = float(input("Betrag (+/-): "))
                 unterkategorie = input("Woher kommt das Geld?: ") if betrag > 0 else input("Für was hast du das Geld ausgegeben?: ")
-                datum_str = input("Datum (TTMMJJJJ): ")
-                datum_obj = d.datetime.strptime(datum_str, "%d%m%Y")
+                datum_str = input("Datum (TTMMJJJJ): ")   #Datum als String speichern
+                datum_obj = d.datetime.strptime(datum_str, "%d%m%Y")  #ins Datumsobjekt umgewandelt
 
                 neue_transaktion = cls(betrag, unterkategorie, datum_obj)
                 transaktionsliste.append(neue_transaktion)
