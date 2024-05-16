@@ -1,33 +1,27 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed May 15 10:01:26 2024
+import datetime as d
 
-@author: Erik
-"""
-
-import datetime as d #Modul 
-
-transaktionsliste = [] #leere Liste
+transaktionsliste = []
 budgets = {}
+budget = 0  # beim Start
 
 class Transaktion:
     nummerzähler = 0
 
-    def __init__(self, betrag, unterkategorie, datum): #Thema 5 im Buch Seite 56. def - Funktion 
+    def __init__(self, betrag, unterkategorie, datum):
         if betrag == 0:
-            print("Wenn du nichts buchen willst dann lass es")
+            print("Wenn du nichts buchen willst, dann lass es")
             return
         Transaktion.nummerzähler += 1
-        self.nummer = Transaktion.nummerzähler #neue Attribute 
+        self.nummer = Transaktion.nummerzähler
         self.betrag = betrag
         self.kategorie = "Einnahme" if betrag > 0 else "Ausgabe"
         self.unterkategorie = unterkategorie
         self.datum = datum
 
-    def getInfoTransaktion(self): #welche Info möchten wir zur Transaktion haben. Eine Reihe von Attribute
+    def getInfoTransaktion(self):
         return f"Nummer: {self.nummer}, Betrag: {self.betrag}, Kategorie: {self.kategorie}, Unterkategorie: {self.unterkategorie}, Datum: {self.datum.strftime('%d.%m.%Y')}"
 
-    def getNummer(self): #Methode um Attribut zu bekommen
+    def getNummer(self):
         return self.nummer
 
     def getBetrag(self):
@@ -42,25 +36,35 @@ class Transaktion:
     def getDatum(self):
         return self.datum
 
-    @classmethod #bezieht sich auf gesamte Klassedeshaltb cls anstatt self, ermöglicht zugriff auf Klasseneigenschaften und anderen Klassenelementen
+    @classmethod
     def neue_transaktion(cls):
         while True:
             try:
                 betrag = float(input("Betrag (+/-): "))
-                unterkategorie = input("Woher kommt das Geld? (Kategorie): ") if betrag > 0 else input("Für was hast du das Geld ausgegeben?: ")
-                datum_str = input("Datum (TTMMJJJJ): ")   #Datum als String speichern
-                datum_obj = d.datetime.strptime(datum_str, "%d%m%Y")  #ins Datumsobjekt umgewandelt
+                unterkategorie = input("Woher kommt das Geld?: ") if betrag > 0 else input("Für was hast du das Geld ausgegeben?: ")
+                datum_str = input("Datum (TTMMJJJJ): ")
+                datum_obj = d.datetime.strptime(datum_str, "%d%m%Y")
 
                 neue_transaktion = cls(betrag, unterkategorie, datum_obj)
-                transaktionsliste.append(neue_transaktion) #neue Transaktion in die Liste transaktionsliste hinzufügen
+                transaktionsliste.append(neue_transaktion)
                 print(f"Transaktion {neue_transaktion.nummer} hinzugefügt.")
+                cls.check_fuer_budget_ueberschreitung(neue_transaktion)
 
                 wasnu = input("Weitere Transaktion hinzufügen? (Ja/Nein) ")
-                if wasnu.lower() != "ja":  #ob die eingegebene Antwort ja
+                if wasnu.lower() != "ja":
                     break
             except Exception as e:
                 print(f"Falsche Eingabe: {e}")
-        
+
+    @classmethod
+    def check_fuer_budget_ueberschreitung(cls, transaktion):
+        if transaktion.kategorie == "Ausgabe" and transaktion.unterkategorie in budgets:
+            monat = transaktion.datum.month
+            jahr = transaktion.datum.year
+            ausgaben = sum(t.getBetrag() for t in transaktionsliste if t.getKategorie() == "Ausgabe" and t.getUnterkategorie() == transaktion.unterkategorie and t.getDatum().month == monat and t.getDatum().year == jahr)
+            if abs(ausgaben) > budgets[transaktion.unterkategorie]:  # berücksichtige negative Beträge
+                print(f"Das Budget für '{transaktion.unterkategorie}' wurde überschritten. Geplantes Budget: {budgets[transaktion.unterkategorie]}, Aktuell ausgegeben: {ausgaben}")
+
     @classmethod
     def vorhandene_unterkategorien(cls):
         return set(transaktion.unterkategorie for transaktion in transaktionsliste)
@@ -87,7 +91,7 @@ def loeschen_transaktionen():
 def budget_setzen():
     vorhandene_unterkategorien = Transaktion.vorhandene_unterkategorien()
     if not vorhandene_unterkategorien:
-        print("Gibt keine")
+        print("Es gibt keine vorhandenen Unterkategorien.")
         return
     kategorie = input("Welche Kategorie?: ")
     if kategorie not in vorhandene_unterkategorien:
@@ -117,7 +121,10 @@ def check_budget():
 
     for unterkategorie, budget in budgets.items():
         spent = sum(tran.betrag for tran in transaktionsliste if tran.unterkategorie == unterkategorie and tran.datum.year == jahr and tran.datum.month == monat)
-        print(f"{unterkategorie}: Budget: {budget}€, Ausgaben: {spent}€ für {jahr}-{monat}, {'Im Budget' if abs(spent)<= budget else 'Budget überschritten'}")
+        if abs(spent) > budget:
+            print(f"{unterkategorie}: Budget: {budget}€, Ausgaben: {spent}€ für {jahr}-{monat}, Budget überschritten")
+        else:
+            print(f"{unterkategorie}: Budget: {budget}€, Ausgaben: {spent}€ für {jahr}-{monat}, Im Budget")
 
 def menu_anzeigen():
     print("\n-------------------------------------------")
@@ -213,9 +220,8 @@ def programm_starten():
             print("Tschüss. Alles Gute.")
             break
         else:
-            print("Eingabe muss zwischen 1 und 7 sein.")
+            print("Eingabe muss zwischen 1 und 8 sein.")
 
-budget = 0  # beim Start
 
 # Beispieltransaktionen
 transaktion01 = Transaktion(-45, "Lebensmittel", d.datetime.strptime("12022024", "%d%m%Y"))
