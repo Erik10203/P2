@@ -1,0 +1,6 @@
+1, -45.0, Ausgaben, Lebensmittel, 12.05.2024
+2, -23.0, Ausgaben, Lebensmittel, 13.05.2024
+3, -28.0, Ausgaben, Handy, 20.05.2024
+4, -15.0, Ausgaben, Restaurant, 21.05.2024
+5, 2000.0, Einnahme, Job, 25.05.2024
+
