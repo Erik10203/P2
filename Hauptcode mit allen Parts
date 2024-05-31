@@ -35,7 +35,39 @@ class Transaktion:
 
     def getDatum(self):
         return self.datum
+    
+    def getTransaktionspeicher(self):
+        return f"{self.nummer}, {self.betrag}, {self.kategorie}, {self.unterkategorie}, {self.datum.strftime('%d.%m.%Y')}"
+    
+    def transaktion_speichern(self):
+        with open ("t.txt", "a") as file:
+            file.write(self.etTransaktionspeicher() + "\n")
+    
+    def transaktion_lesen1(self): #gibt mit Betrag: -300 Kategorie: Ausgabe wieder
+        tliste1 = []
+        with open ("t.txt", "r") as file:
+            for line in file:
+                tliste1.append(line.strip())
+            return tliste1
 
+    @classmethod
+    def transaktion_lesen2(cls):
+        tliste2 = []
+        try:
+            with open("t.txt", "r") as file:
+                for line in file:
+                    parts = line.strip().split(', ')
+                    if len(parts) == 5:
+                        nummer, betrag, kategorie, unterkategorie, datum_str = parts
+                        datum_obj = d.datetime.strptime(datum_str, "%d.%m.%Y")
+                        transaktion = cls(float(betrag), unterkategorie, datum_obj)
+                        tliste2.append(transaktion)
+            return  tliste2
+        except FileNotFoundError:
+            print("Datei t.txt nicht gefunden.")
+            return []
+         
+    
     @classmethod
     def neue_transaktion(cls):
         while True:
@@ -46,7 +78,7 @@ class Transaktion:
                 datum_obj = d.datetime.strptime(datum_str, "%d%m%Y")
 
                 neue_transaktion = cls(betrag, unterkategorie, datum_obj)
-                transaktionsliste.append(neue_transaktion)
+                cls.transaktion_speichern(neue_transaktion)
                 print(f"Transaktion {neue_transaktion.nummer} hinzugefügt.")
                 cls.check_fuer_budget_ueberschreitung(neue_transaktion)
 
@@ -80,13 +112,23 @@ def anzeigen_transaktionen_filter(gefilterte_transaktionen):
 def loeschen_transaktionen():
     anzeigen_transaktionen()
     loeschauswahl = int(input("Gib die Transaktionsnummer der Transaktion ein, die du löschen möchtest: "))
+    transaktion_gefunden = False
+
     for transaktion in transaktionsliste:
         if transaktion.getNummer() == loeschauswahl:
             transaktionsliste.remove(transaktion)
+            transaktion_gefunden = True
             print(f"Transaktion {loeschauswahl} gelöscht.")
             break
-    else:
+
+    if not transaktion_gefunden:
         print("Transaktion nicht gefunden.")
+    else:
+        with open("t.txt", "w") as file:
+            for transaktion in transaktionsliste:
+                file.write(transaktion.getTransaktionspeicher() + "\n")
+
+    print("Transaktionsliste aktualisiert.")
 
 def budget_setzen():
     vorhandene_unterkategorien = Transaktion.vorhandene_unterkategorien()
@@ -197,6 +239,10 @@ def Zeitraumfilter():
     Kontostand_Zeitraum(gefilterte_transaktionen)
 
 def programm_starten():
+    
+    global transaktionsliste
+    transaktionsliste = Transaktion.transaktion_lesen2()
+    
     while True:
         menu_anzeigen()
         auswahl = input("Wähl mal eine Option: ")
@@ -223,17 +269,6 @@ def programm_starten():
             print("Eingabe muss zwischen 1 und 8 sein.")
 
 
-# Beispieltransaktionen
-transaktion01 = Transaktion(-45, "Lebensmittel", d.datetime.strptime("12022024", "%d%m%Y"))
-transaktion02 = Transaktion(-23, "Lebensmittel", d.datetime.strptime("15022024", "%d%m%Y"))
-transaktion03 = Transaktion(-28, "Handy", d.datetime.strptime("16022024", "%d%m%Y"))
-transaktion04 = Transaktion(-15, "Restaurant", d.datetime.strptime("20022024", "%d%m%Y"))
-transaktion05 = Transaktion(2000, "Job", d.datetime.strptime("20022024", "%d%m%Y"))
 
-transaktionsliste.append(transaktion01)
-transaktionsliste.append(transaktion02)
-transaktionsliste.append(transaktion03)
-transaktionsliste.append(transaktion04)
-transaktionsliste.append(transaktion05)
 
 programm_starten()
