@@ -41,7 +41,7 @@ class Transaktion:
     
     def transaktion_speichern(self):
         with open ("t.txt", "a") as file:
-            file.write(self.etTransaktionspeicher() + "\n")
+            file.write(self.getTransaktionspeicher())
     
     def transaktion_lesen1(self): #gibt mit Betrag: -300 Kategorie: Ausgabe wieder
         tliste1 = []
@@ -79,6 +79,7 @@ class Transaktion:
 
                 neue_transaktion = cls(betrag, unterkategorie, datum_obj)
                 cls.transaktion_speichern(neue_transaktion)
+                transaktionsliste.append(neue_transaktion)
                 print(f"Transaktion {neue_transaktion.nummer} hinzugefügt.")
                 cls.check_fuer_budget_ueberschreitung(neue_transaktion)
 
@@ -267,8 +268,5 @@ def programm_starten():
             break
         else:
             print("Eingabe muss zwischen 1 und 8 sein.")
-
-
-
 
 programm_starten()
