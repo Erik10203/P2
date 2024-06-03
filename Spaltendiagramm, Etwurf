@@ -1,0 +1,37 @@
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg #wir importieren Klass "FigureCanvasTkAgg" ...
+#...vom Modul "matplotlib.backends.backend_tkagg". "backend" gehört zum System, das für das Zeichnen der Graphen...
+#... verantwortlich ist. "matplotlib.backends.backend_tkagg" ist ein bestimmter "backend" für die Nutzung mit Tkinter
+import tkinter as tk
+
+unterkategorien = ["Essen", "Unterkategorie 2", "Unterkategorie 3", "Unterkategorie 4"] #soll aus der Liste genommen werden
+ausgaben = [34, 25, 43, 31] #z.B soll aus der Liste genommen werden
+
+# Fenster erstellen
+root = tk.Tk()
+root.title("Diagramm")
+
+#Diagramm erstellen
+fig, ax = plt.subplots(figsize=(10, 6)) #Finktion "subplots" aus Bibliothek "matplotlib.pyplot." erstellt ein Figure-Objekt...
+#  und eine oder mehrere Achsen. In Klammern sind Breite und Höhe in Zoll
+balken = plt.bar(unterkategorien, ausgaben, color=['blue', 'green', 'red', 'purple'], width=0.7, edgecolor='black')
+
+#Diagrammeigenschaften
+plt.bar(unterkategorien, ausgaben) #Diagrammtyp und welche x y - Daten
+plt.title("Ausgaben", fontsize=15) #Name des Diagramms und Schriftröße
+plt.xlabel("Unterkategorien", fontsize=12) #Name x
+plt.ylabel("Insgesamt ausgegeben", fontsize=12) #Name y
+
+
+# Diagramm im Fester zeigen mit Tkinter 
+canvas = FigureCanvasTkAgg(fig, master=root)
+canvas.draw()
+canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+# Knopf Exit
+quit_button = tk.Button(master=root, text="Exit", command=root.quit)
+quit_button.pack(side=tk.BOTTOM)
+
+#Diagramm zeigen
+tk.mainloop()
+
