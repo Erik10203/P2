@@ -22,7 +22,7 @@ ax.set_title("Ausgaben", fontsize=15) #Name des Diagramms und Schriftröße
 ax.set_xlabel("Unterkategorien", fontsize=12) #Name x
 ax.set_ylabel("Insgesamt ausgegeben", fontsize=12) #Name y
 
-# Diagramm im Fester zeigen mit Tkinter 
+# Diagramm im Fester mit Tkinter zeigen
 canvas = FigureCanvasTkAgg(fig, master=root)
 canvas.draw()
 canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
