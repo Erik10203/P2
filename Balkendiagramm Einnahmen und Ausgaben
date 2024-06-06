@@ -1,0 +1,54 @@
+##Balkendiagramm##
+
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Beispiel Daten
+zeitpunkte = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez']
+einnahmen_und_ausgaben = [5000, -3000, 7000, -4000, 8000, -5000, 6000, -3500, 7500, -4500, 9000, -5500,
+                          8500, -5000, 9500, -6000, 7000, -4000, 6500, -3800, 8000, -4800, 9000, -5200]
+
+# Trenne Einnahmen und Ausgaben
+einnahmen = []
+ausgaben = []
+
+for value in einnahmen_und_ausgaben:
+    if value > 0:
+        einnahmen.append(value)
+    else:
+        einnahmen.append(0)
+
+for value in einnahmen_und_ausgaben:
+    if value < 0:
+        ausgaben.append(abs(value))
+    else:
+        ausgaben.append(0)
+        
+        
+# Erstelle ein DataFrame zweidimensionale tabellarische Datenstruktur
+df = pd.DataFrame({
+    'Zeitpunkte': zeitpunkte,
+    'Einnahmen': einnahmen[::2],  # Nur die Einnahmen-Werte (jede zweite Zahl ab der ersten)
+    'Ausgaben': ausgaben[1::2]    # Nur die Ausgaben-Werte (jede zweite Zahl ab der zweiten)
+})
+
+# Setze Zeitpunkte als Index
+df.set_index('Zeitpunkte', inplace=True)
+
+# Erstelle das Balkendiagramm
+ax = df.plot(kind='bar', color=['green', 'red'], figsize=(16, 9))
+
+# Beschriftungen und Titel hinzufügen
+plt.title('Einnahmen und Ausgaben über den zeitlichen Verlauf')
+plt.xlabel('Zeitpunkte')
+plt.ylabel('Betrag in Euro')
+plt.xticks(rotation=45)
+plt.legend(title='Kategorie')
+
+# Diagramm anzeigen
+plt.tight_layout()
+plt.show()
+
+
+
+
