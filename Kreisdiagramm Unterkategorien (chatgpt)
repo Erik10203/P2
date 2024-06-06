@@ -1,0 +1,28 @@
+##Kreisdiagramm
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Beispiel-Daten für verschiedene Ausgabenarten
+ausgaben = {
+    'Lebensmittel': [150, 200, 250],
+    'Transport': [50, 75, 100],
+    'Freizeit': [120, 80, 60],
+    'Miete': [800, 800, 800],
+    'Versicherung': [300, 300, 300]
+}
+
+# Daten in ein DataFrame umwandeln
+df = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in ausgaben.items()]))
+
+# Summen der Ausgaben berechnen
+summen = df.sum()
+
+# Kategorien und Summen extrahieren
+labels = summen.index
+sizes = summen.values
+
+# Kreisdiagramm erstellen
+plt.figure(figsize=(8, 8))
+plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=140)
+plt.title('Anteil der Ausgabenarten')
+plt.show()
