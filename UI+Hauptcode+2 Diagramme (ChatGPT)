@@ -1,0 +1,362 @@
+#zum Testen und Verständnis wäre hilfreich
+
+import datetime as d
+import tkinter as tk
+from tkinter import messagebox, ttk
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+
+transaktionsliste = []
+budgets = {}
+budget = 0  
+
+class Transaktion:
+    nummerzaehler = 0
+
+    def __init__(self, betrag, unterkategorie, datum):
+        if betrag == 0:
+            print("Wenn du nichts buchen willst, dann lass es")
+            return
+        Transaktion.nummerzaehler += 1
+        self.nummer = Transaktion.nummerzaehler
+        self.betrag = betrag
+        self.kategorie = "Einnahme" if betrag > 0 else "Ausgabe"
+        self.unterkategorie = unterkategorie
+        self.datum = datum
+
+    def getInfoTransaktion(self):
+        return f"Nummer: {self.nummer}, Betrag: {self.betrag}, Kategorie: {self.kategorie}, Unterkategorie: {self.unterkategorie}, Datum: {self.datum.strftime('%d.%m.%Y')}"
+
+    def getNummer(self):
+        return self.nummer
+
+    def getBetrag(self):
+        return self.betrag
+
+    def getKategorie(self):
+        return self.kategorie
+
+    def getUnterkategorie(self):
+        return self.unterkategorie
+
+    def getDatum(self):
+        return self.datum
+    
+    def getTransaktionspeicher(self):
+        return f"{self.nummer}, {self.betrag}, {self.kategorie}, {self.unterkategorie}, {self.datum.strftime('%d.%m.%Y')}"
+    
+    def transaktion_speichern(self):
+        with open("t.txt", "a") as file:
+            file.write(self.getTransaktionspeicher() + "\n")
+    
+    @staticmethod
+    def transaktion_lesen1():
+        tliste1 = []
+        with open("t.txt", "r") as file:
+            for line in file:
+                tliste1.append(line.strip())
+        return tliste1
+
+    @classmethod
+    def transaktion_lesen2(cls):
+        tliste2 = []
+        try:
+            with open("t.txt", "r") as file:
+                for line in file:
+                    parts = line.strip().split(', ')
+                    if len(parts) == 5:
+                        nummer, betrag, kategorie, unterkategorie, datum_str = parts
+                        datum_obj = d.datetime.strptime(datum_str, "%d.%m.%Y")
+                        transaktion = cls(float(betrag), unterkategorie, datum_obj)
+                        tliste2.append(transaktion)
+            return tliste2
+        except FileNotFoundError:
+            print("Datei t.txt nicht gefunden.")
+            return []
+         
+    @classmethod
+    def neue_transaktion(cls):
+        while True:
+            try:
+                betrag = float(input("Betrag (+/-): "))
+                unterkategorie = input("Woher kommt das Geld?: ") if betrag > 0 else input("Für was hast du das Geld ausgegeben?: ")
+                datum_str = input("Datum (TTMMJJJJ): ")
+                datum_obj = d.datetime.strptime(datum_str, "%d%m%Y")
+
+                neue_transaktion = cls(betrag, unterkategorie, datum_obj)
+                neue_transaktion.transaktion_speichern()
+                transaktionsliste.append(neue_transaktion)
+                print(f"Transaktion {neue_transaktion.nummer} hinzugefügt.")
+                cls.check_fuer_budget_ueberschreitung(neue_transaktion)
+
+                wasnu = input("Weitere Transaktion hinzufügen? (Ja/Nein) ")
+                if wasnu.lower() != "ja":
+                    break
+            except Exception as e:
+                print(f"Falsche Eingabe: {e}")
+
+    @classmethod
+    def check_fuer_budget_ueberschreitung(cls, transaktion):
+        if transaktion.kategorie == "Ausgabe" and transaktion.unterkategorie in budgets:
+            monat = transaktion.datum.month
+            jahr = transaktion.datum.year
+            ausgaben = sum(t.getBetrag() for t in transaktionsliste if t.getKategorie() == "Ausgabe" and t.getUnterkategorie() == transaktion.unterkategorie and t.getDatum().month == monat and t.getDatum().year == jahr)
+            if abs(ausgaben) > budgets[transaktion.unterkategorie]:  
+                print(f"Das Budget für '{transaktion.unterkategorie}' wurde überschritten. Geplantes Budget: {budgets[transaktion.unterkategorie]}, Aktuell ausgegeben: {ausgaben}")
+
+    @classmethod
+    def vorhandene_unterkategorien(cls):
+        return set(transaktion.unterkategorie for transaktion in transaktionsliste)
+
+def anzeigen_transaktionen():
+    for transaktion in transaktionsliste:
+        print(f"Transaktionsnummer: {transaktion.getNummer()}, Datum: {transaktion.getDatum().strftime('%d.%m.%Y')}, Betrag: {transaktion.getBetrag()} €, Kategorie: {transaktion.getKategorie()}, Unterkategorie: {transaktion.getUnterkategorie()}")
+
+def anzeigen_transaktionen_filter(gefilterte_transaktionen):
+    for transaktion in gefilterte_transaktionen:
+        print(f"Transaktionsnummer: {transaktion.getNummer()}, Datum: {transaktion.getDatum().strftime('%d.%m.%Y')}, Betrag: {transaktion.getBetrag()} €, Kategorie: {transaktion.getKategorie()}, Unterkategorie: {transaktion.getUnterkategorie()}")
+
+def loeschen_transaktionen():
+    anzeigen_transaktionen()
+    loeschauswahl = int(input("Gib die Transaktionsnummer der Transaktion ein, die du löschen möchtest: "))
+    transaktion_gefunden = False
+
+    for transaktion in transaktionsliste:
+        if transaktion.getNummer() == loeschauswahl:
+            transaktionsliste.remove(transaktion)
+            transaktion_gefunden = True
+            print(f"Transaktion {loeschauswahl} gelöscht.")
+            break
+
+    if not transaktion_gefunden:
+        print("Transaktion nicht gefunden.")
+    else:
+        with open("t.txt", "w") as file:
+            for transaktion in transaktionsliste:
+                file.write(transaktion.getTransaktionspeicher() + "\n")
+
+    print("Transaktionsliste aktualisiert.")
+
+def budget_setzen():
+    vorhandene_unterkategorien = Transaktion.vorhandene_unterkategorien()
+    if not vorhandene_unterkategorien:
+        print("Es gibt keine vorhandenen Unterkategorien.")
+        return
+    kategorie = input("Welche Kategorie?: ")
+    if kategorie not in vorhandene_unterkategorien:
+        print(f"Die Kategorie '{kategorie}' existiert nicht.")
+        return
+    try:
+        betrag = float(input(f"Welches Budget für {kategorie} setzen?: "))
+        budgets[kategorie] = betrag
+        print(f"Das Budget für {kategorie} wurde auf {betrag} gesetzt.")
+    except ValueError:
+        print("Ungültiger Betrag")
+
+def check_budget():
+    jahr = int(input("Gib das Jahr ein: ")) 
+    monat = int(input("Gib den Monat ein: "))
+    
+    total_income = 0
+    total_expenses = 0
+    for tran in transaktionsliste:
+        if tran.getDatum().year == jahr and tran.getDatum().month == monat:
+            if tran.getKategorie() == "Einnahme":
+                total_income += tran.getBetrag()
+            elif tran.getKategorie() == "Ausgabe":
+                total_expenses += tran.getBetrag()
+
+    print(f"Total Einnahmen: {total_income}€, Total Ausgaben: {total_expenses}€ für {jahr}-{monat}")
+
+    for unterkategorie, budget in budgets.items():
+        spent = sum(tran.getBetrag() for tran in transaktionsliste if tran.getUnterkategorie() == unterkategorie and tran.getDatum().year == jahr and tran.getDatum().month == monat)
+        if abs(spent) > budget:
+            print(f"{unterkategorie}: Budget: {budget}€, Ausgaben: {spent}€ für {jahr}-{monat}, Budget überschritten")
+        else:
+            print(f"{unterkategorie}: Budget: {budget}€, Ausgaben: {spent}€ für {jahr}-{monat}, Budget eingehalten")
+
+def create_transaction_entry_window():
+    entry_window = tk.Toplevel()
+    entry_window.title("Neue Transaktion")
+
+    tk.Label(entry_window, text="Betrag (+/-):").grid(row=0)
+    betrag_entry = tk.Entry(entry_window)
+    betrag_entry.grid(row=0, column=1)
+
+    tk.Label(entry_window, text="Unterkategorie:").grid(row=1)
+    unterkategorie_entry = tk.Entry(entry_window)
+    unterkategorie_entry.grid(row=1, column=1)
+
+    tk.Label(entry_window, text="Datum (TTMMJJJJ):").grid(row=2)
+    datum_entry = tk.Entry(entry_window)
+    datum_entry.grid(row=2, column=1)
+
+    def save_transaction():
+        try:
+            betrag = float(betrag_entry.get())
+            unterkategorie = unterkategorie_entry.get()
+            datum_str = datum_entry.get()
+            datum_obj = d.datetime.strptime(datum_str, "%d%m%Y")
+            neue_transaktion = Transaktion(betrag, unterkategorie, datum_obj)
+            neue_transaktion.transaktion_speichern()
+            transaktionsliste.append(neue_transaktion)
+            messagebox.showinfo("Erfolg", "Transaktion gespeichert.")
+            entry_window.destroy()
+        except Exception as e:
+            messagebox.showerror("Fehler", f"Ungültige Eingabe: {e}")
+
+    tk.Button(entry_window, text="Speichern", command=save_transaction).grid(row=3, columnspan=2)
+
+def create_budget_set_window():
+    budget_window = tk.Toplevel()
+    budget_window.title("Budget setzen")
+
+    tk.Label(budget_window, text="Unterkategorie:").grid(row=0)
+    unterkategorie_entry = tk.Entry(budget_window)
+    unterkategorie_entry.grid(row=0, column=1)
+
+    tk.Label(budget_window, text="Betrag:").grid(row=1)
+    betrag_entry = tk.Entry(budget_window)
+    betrag_entry.grid(row=1, column=1)
+
+    def save_budget():
+        try:
+            unterkategorie = unterkategorie_entry.get()
+            betrag = float(betrag_entry.get())
+            budgets[unterkategorie] = betrag
+            messagebox.showinfo("Erfolg", "Budget gesetzt.")
+            budget_window.destroy()
+        except ValueError:
+            messagebox.showerror("Fehler", "Ungültiger Betrag")
+
+    tk.Button(budget_window, text="Speichern", command=save_budget).grid(row=2, columnspan=2)
+
+def create_check_budget_window():
+    check_window = tk.Toplevel()
+    check_window.title("Budget überprüfen")
+
+    tk.Label(check_window, text="Jahr:").grid(row=0)
+    jahr_entry = tk.Entry(check_window)
+    jahr_entry.grid(row=0, column=1)
+
+    tk.Label(check_window, text="Monat:").grid(row=1)
+    monat_entry = tk.Entry(check_window)
+    monat_entry.grid(row=1, column=1)
+
+    def check():
+        try:
+            jahr = int(jahr_entry.get())
+            monat = int(monat_entry.get())
+            total_income = 0
+            total_expenses = 0
+            for tran in transaktionsliste:
+                if tran.getDatum().year == jahr and tran.getDatum().month == monat:
+                    if tran.getKategorie() == "Einnahme":
+                        total_income += tran.getBetrag()
+                    elif tran.getKategorie() == "Ausgabe":
+                        total_expenses += tran.getBetrag()
+
+            result_text = f"Total Einnahmen: {total_income}€, Total Ausgaben: {total_expenses}€ für {jahr}-{monat}\n"
+            for unterkategorie, budget in budgets.items():
+                spent = sum(tran.getBetrag() for tran in transaktionsliste if tran.getUnterkategorie() == unterkategorie and tran.getDatum().year == jahr and tran.getDatum().month == monat)
+                if abs(spent) > budget:
+                    result_text += f"{unterkategorie}: Budget: {budget}€, Ausgaben: {spent}€ für {jahr}-{monat}, Budget überschritten\n"
+                else:
+                    result_text += f"{unterkategorie}: Budget: {budget}€, Ausgaben: {spent}€ für {jahr}-{monat}, Budget eingehalten\n"
+            messagebox.showinfo("Budget überprüfen", result_text)
+        except ValueError:
+            messagebox.showerror("Fehler", "Ungültige Eingabe")
+
+    tk.Button(check_window, text="Überprüfen", command=check).grid(row=2, columnspan=2)
+
+def show_transactions_window():
+    transactions_window = tk.Toplevel()
+    transactions_window.title("Transaktionen anzeigen")
+
+    tree = ttk.Treeview(transactions_window, columns=("Nummer", "Betrag", "Kategorie", "Unterkategorie", "Datum"), show="headings")
+    tree.heading("Nummer", text="Nummer")
+    tree.heading("Betrag", text="Betrag")
+    tree.heading("Kategorie", text="Kategorie")
+    tree.heading("Unterkategorie", text="Unterkategorie")
+    tree.heading("Datum", text="Datum")
+
+    for transaktion in transaktionsliste:
+        tree.insert("", tk.END, values=(transaktion.getNummer(), transaktion.getBetrag(), transaktion.getKategorie(), transaktion.getUnterkategorie(), transaktion.getDatum().strftime('%d.%m.%Y')))
+
+    tree.pack(fill=tk.BOTH, expand=True)
+
+def create_pie_chart_window():
+    categories = {}
+    for tran in transaktionsliste:
+        if tran.getKategorie() == "Ausgabe":
+            if tran.getUnterkategorie() in categories:
+                categories[tran.getUnterkategorie()] += abs(tran.getBetrag())
+            else:
+                categories[tran.getUnterkategorie()] = abs(tran.getBetrag())
+    
+    if not categories:
+        messagebox.showinfo("Information", "Keine Ausgaben verfügbar, um ein Diagramm zu erstellen.")
+        return
+
+    chart_window = tk.Toplevel()
+    chart_window.title("Ausgaben-Diagramm")
+
+    fig, ax = plt.subplots()
+    ax.pie(categories.values(), labels=categories.keys(), autopct='%1.1f%%', startangle=90)
+    ax.axis('equal')  # Gleichmäßige Darstellung
+
+    canvas = FigureCanvasTkAgg(fig, master=chart_window)
+    canvas.draw()
+    canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
+def create_bar_chart_window():
+    # Сбор данных для гистограммы
+    monthly_expenses = {}
+    for tran in transaktionsliste:
+        if tran.getKategorie() == "Ausgabe":
+            key = tran.getDatum().strftime('%Y-%m')
+            if key in monthly_expenses:
+                monthly_expenses[key] += abs(tran.getBetrag())
+            else:
+                monthly_expenses[key] = abs(tran.getBetrag())
+
+    if not monthly_expenses:
+        messagebox.showinfo("Information", "Keine Ausgaben verfügbar, um ein Diagramm zu erstellen.")
+        return
+
+    months = list(monthly_expenses.keys())
+    expenses = list(monthly_expenses.values())
+
+    chart_window = tk.Toplevel()
+    chart_window.title("Monatliche Ausgaben")
+
+    fig, ax = plt.subplots()
+    ax.bar(months, expenses)
+    ax.set_xlabel("Monat")
+    ax.set_ylabel("Ausgaben (€)")
+    ax.set_title("Monatliche Ausgaben")
+
+    canvas = FigureCanvasTkAgg(fig, master=chart_window)
+    canvas.draw()
+    canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
+def main():
+    root = tk.Tk()
+    root.title("Budget Manager")
+
+    tk.Button(root, text="Neue Transaktion", command=create_transaction_entry_window).pack()
+    tk.Button(root, text="Transaktionen anzeigen", command=show_transactions_window).pack()
+    tk.Button(root, text="Transaktion löschen", command=loeschen_transaktionen).pack()
+    tk.Button(root, text="Budget setzen", command=create_budget_set_window).pack()
+    tk.Button(root, text="Budget überprüfen", command=create_check_budget_window).pack()
+    tk.Button(root, text="Ausgaben-Diagramm", command=create_pie_chart_window).pack()
+    tk.Button(root, text="Monatliche Ausgaben", command=create_bar_chart_window).pack()
+
+    root.mainloop()
+
+# Lesen Sie die vorhandenen Transaktionen aus der Datei
+transaktionsliste = Transaktion.transaktion_lesen2()
+
+if __name__ == "__main__":
+    main()
