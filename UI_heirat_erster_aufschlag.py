@@ -3,6 +3,8 @@ import datetime as d
 import tkinter as tk
 from tkinter import messagebox, simpledialog
 from tkinter import ttk
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 transaktionsliste = []
 budgets = {}
@@ -54,6 +56,21 @@ class Transaktion:
    
     def getTransaktionspeicher(self):
         return f"{self.nummer}, {self.betrag}, {self.kategorie}, {self.unterkategorie}, {self.datum.strftime('%d.%m.%Y')}"
+    
+    def getNummer(self):
+        return self.nummer
+
+    def getBetrag(self):
+        return self.betrag
+
+    def getKategorie(self):
+        return self.kategorie
+
+    def getUnterkategorie(self):
+        return self.unterkategorie
+
+    def getDatum(self):
+        return self.datum
 
     @classmethod
     def transaktion_speichern(cls, transaktion):
@@ -110,12 +127,20 @@ class Transaktion:
     
 #Zeigt alle Transaktionen in einem txt Popup
 def anzeigen_transaktionen():
-    anzeige_fenster = tk.Toplevel(root)
-    anzeige_fenster.title("Transaktionen anzeigen")
-    text_area = tk.Text(anzeige_fenster, wrap="word")
-    text_area.pack(expand=True, fill="both")
+    transactions_window = tk.Toplevel()
+    transactions_window.title("Transaktionen anzeigen")
+
+    tree = ttk.Treeview(transactions_window, columns=("Nummer", "Betrag", "Kategorie", "Unterkategorie", "Datum"), show="headings")
+    tree.heading("Nummer", text="Nummer")
+    tree.heading("Betrag", text="Betrag")
+    tree.heading("Kategorie", text="Kategorie")
+    tree.heading("Unterkategorie", text="Unterkategorie")
+    tree.heading("Datum", text="Datum")
+
     for transaktion in transaktionsliste:
-        text_area.insert(tk.END, f"Transaktionsnummer: {transaktion.nummer}, Datum: {transaktion.datum.strftime('%d.%m.%Y')}, Betrag: {transaktion.betrag} €, Kategorie: {transaktion.kategorie}, Unterkategorie: {transaktion.unterkategorie}\n")
+        tree.insert("", tk.END, values=(transaktion.getNummer(), transaktion.getBetrag(), transaktion.getKategorie(), transaktion.getUnterkategorie(), transaktion.getDatum().strftime('%d.%m.%Y')))
+
+    tree.pack(fill=tk.BOTH, expand=True)
 
 #Zeigt alle Transaktionen (im ausgewählten Zeitraumfilter) in einem txt Popup
 def anzeigen_transaktionen_filter(gefilterte_transaktionen):
@@ -378,6 +403,71 @@ def grafische_auswertungen():
     fenster_schließen()
     
     grafische_auswertungen_frame.pack(fill="both", expand=1)
+    
+    def create_pie_chart_window():
+        categories = {}
+        for tran in transaktionsliste:
+            if tran.getKategorie() == "Ausgabe":
+                if tran.getUnterkategorie() in categories:
+                    categories[tran.getUnterkategorie()] += abs(tran.getBetrag())
+                else:
+                    categories[tran.getUnterkategorie()] = abs(tran.getBetrag())
+        
+        if not categories:
+            messagebox.showinfo("Information", "Keine Ausgaben verfügbar, um ein Diagramm zu erstellen.")
+            return
+
+        chart_window = tk.Toplevel()
+        chart_window.title("Ausgaben-Diagramm")
+
+        fig, ax = plt.subplots()
+        ax.pie(categories.values(), labels=categories.keys(), autopct='%1.1f%%', startangle=90)
+        ax.axis('equal')  # Gleichmäßige Darstellung
+
+        canvas = FigureCanvasTkAgg(fig, master=chart_window)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+        
+        
+        
+    def create_bar_chart_window():
+        # Сбор данных для гистограммы
+        monthly_expenses = {}
+        for tran in transaktionsliste:
+            if tran.getKategorie() == "Ausgabe":
+                key = tran.getDatum().strftime('%Y-%m')
+                if key in monthly_expenses:
+                    monthly_expenses[key] += abs(tran.getBetrag())
+                else:
+                    monthly_expenses[key] = abs(tran.getBetrag())
+
+        if not monthly_expenses:
+            messagebox.showinfo("Information", "Keine Ausgaben verfügbar, um ein Diagramm zu erstellen.")
+            return
+
+        months = list(monthly_expenses.keys())
+        expenses = list(monthly_expenses.values())
+
+        chart_window = tk.Toplevel()
+        chart_window.title("Monatliche Ausgaben")
+
+        fig, ax = plt.subplots()
+        ax.bar(months, expenses)
+        ax.set_xlabel("Monat")
+        ax.set_ylabel("Ausgaben (€)")
+        ax.set_title("Monatliche Ausgaben")
+
+        canvas = FigureCanvasTkAgg(fig, master=chart_window)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+        
+    #Button führt bei Betätigung Logig der Funktion aus
+    button = tk.Button(grafische_auswertungen_frame, text="Pie Chart", command=create_pie_chart_window)
+    button.grid(row=3, column=1, columnspan=2, pady=10) 
+    
+    #Button führt bei Betätigung Logig der Funktion aus
+    button2 = tk.Button(grafische_auswertungen_frame, text="Bar Chart", command=create_bar_chart_window)
+    button2.grid(row=3, column=3, columnspan=2, pady=10) 
     
     #hier gerne die Grafiken einfügen und schauen wie es aussieht. Können uns gerne abprechen wie das UI hier aussehen soll.
     #Beachte: die Grafiken müssen in "grafische_auswertungen_frame" eingefügt werden damit sie sichtbar sind.
