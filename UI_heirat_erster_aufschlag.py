@@ -396,7 +396,6 @@ def zeitraumfilter():
 
 
 
-#noch keine Grafiken
 
 def grafische_auswertungen():
     
