@@ -388,7 +388,6 @@ def neue_transaktion_fenster():
 
     tk.Label( neue_transaktion_frame, text="Datum (TTMMJJJJ):").grid(row=2, column=0)
     entry_datum = tk.Entry( neue_transaktion_frame)
-    entry_datum.insert(0, d.datetime.now().strftime("%d%m%Y"))
     entry_datum.grid(row=2, column=1)
     
     #Button führt bei Betätigung Logig der Funktion aus
@@ -454,11 +453,52 @@ def zeitraumfilter():
     button = tk.Button(zeitraumfilter_frame, text="Zeitraumfilter anwenden", command=ausfuehren)
     button.grid(row=3, column=1, columnspan=2, pady=10) 
 
-
-
-
-def grafische_auswertungen():
+def plot_einnahmen_ausgaben(transaktionsliste):
+    # Daten vorbereiten
+    monatsdaten = {}
+    for t in transaktionsliste:
+        monat = t.datum.strftime('%Y-%m')
+        if monat not in monatsdaten:
+            monatsdaten[monat] = {'einnahmen': 0, 'ausgaben': 0}
+        
+        if t.betrag >= 0:
+            monatsdaten[monat]['einnahmen'] += t.betrag
+        else:
+            monatsdaten[monat]['ausgaben'] += abs(t.betrag)
     
+    monate = sorted(monatsdaten.keys())
+    einnahmen = [monatsdaten[monat]['einnahmen'] for monat in monate]
+    ausgaben = [monatsdaten[monat]['ausgaben'] for monat in monate]
+    
+    x = range(len(monate))
+    
+    fig, ax = plt.subplots()
+
+    # Diagramm zeichnen
+    bar_width = 0.4
+    ax.bar(x, einnahmen, width=bar_width, label='Einnahmen', align='center')
+    ax.bar([p + bar_width for p in x], ausgaben, width=bar_width, label='Ausgaben', align='center')
+
+    # Achsen beschriften
+    ax.set_xlabel('Monat')
+    ax.set_ylabel('Betrag (€)')
+    ax.set_title('Einnahmen und Ausgaben pro Monat')
+    ax.set_xticks([p + bar_width / 2 for p in x])
+    ax.set_xticklabels(monate)
+    
+    # Legende hinzufügen
+    ax.legend()
+
+    # Diagramm in ein neues Fenster einbetten
+    chart_window = tk.Toplevel()
+    chart_window.title("Einnahmen und Ausgaben Diagramm")
+
+    canvas = FigureCanvasTkAgg(fig, master=chart_window)
+    canvas.draw()
+    canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
+# Integration in die grafische_auswertungen-Funktion
+def grafische_auswertungen():
     fenster_schließen()
     
     grafische_auswertungen_frame.pack(fill="both", expand=1)
@@ -486,6 +526,50 @@ def grafische_auswertungen():
         canvas = FigureCanvasTkAgg(fig, master=chart_window)
         canvas.draw()
         canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+        
+    def create_bar_chart_window():
+        # Сбор данных для гистограммы
+        monthly_expenses = {}
+        for tran in transaktionsliste:
+            if tran.getKategorie() == "Ausgabe":
+                key = tran.getDatum().strftime('%Y-%m')
+                if key in monthly_expenses:
+                    monthly_expenses[key] += abs(tran.getBetrag())
+                else:
+                    monthly_expenses[key] = abs(tran.getBetrag())
+
+        if not monthly_expenses:
+            messagebox.showinfo("Information", "Keine Ausgaben verfügbar, um ein Diagramm zu erstellen.")
+            return
+
+        months = list(monthly_expenses.keys())
+        expenses = list(monthly_expenses.values())
+
+        chart_window = tk.Toplevel()
+        chart_window.title("Monatliche Ausgaben")
+
+        fig, ax = plt.subplots()
+        ax.bar(months, expenses)
+        ax.set_xlabel("Monat")
+        ax.set_ylabel("Ausgaben (€)")
+        ax.set_title("Monatliche Ausgaben")
+
+        canvas = FigureCanvasTkAgg(fig, master=chart_window)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+        
+    # Button zur Anzeige des Pie Charts
+    button = tk.Button(grafische_auswertungen_frame, text="Pie Chart", command=create_pie_chart_window)
+    button.grid(row=3, column=1, columnspan=2, pady=10) 
+    
+    # Button zur Anzeige des Bar Charts
+    button2 = tk.Button(grafische_auswertungen_frame, text="Bar Chart", command=create_bar_chart_window)
+    button2.grid(row=3, column=3, columnspan=2, pady=10)
+
+    # Button zur Anzeige des neuen Einnahmen und Ausgaben Diagramms
+    button3 = tk.Button(grafische_auswertungen_frame, text="Einnahmen und Ausgaben", command=lambda: plot_einnahmen_ausgaben(transaktionsliste))
+    button3.grid(row=3, column=5, columnspan=2, pady=10)
+
         
         
         
