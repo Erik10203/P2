@@ -534,6 +534,8 @@ def grafische_auswertungen():
 
 
 
+global transaktionsliste
+transaktionsliste = Transaktion.transaktion_lesen2()
 
 #Startfenster
 root = tk.Tk()
