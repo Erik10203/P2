@@ -251,90 +251,91 @@ def budget_setzen():
 #BUG: check_budget ruft keine gespeicherten Daten auf. Transaktionen und Budgets aus vorherigen Sitzungen werden nicht abgerufen.
 #BUG: check_budget ruft keine gespeicherten Daten auf. Transaktionen und Budgets aus vorherigen Sitzungen werden nicht abgerufen.
 
-def check_budget():
-    
-    #alte fenster schließen
+
+# Methode zur Darstellung der vergebenen Budgets als Kreisdiagramm
+def vergebene_budgets():
     fenster_schließen()
-    
-    #öffnet neues fenster
-    budget_check_frame.pack(fill="both", expand=1)
-    
-    #Text und Eingabefelder
-    jahr_text = tk.Label(budget_check_frame, text="Jahr:", font=('Arial', 12))
-    jahr_text.grid(row=1, column=0)
-    
-    jahr_eingabe = tk.Entry(budget_check_frame, width=30, font=("Arial", 12))
-    jahr_eingabe.grid(row=1, column=1, padx=10)
-    
-    monat_text = tk.Label(budget_check_frame, text="Monat:", font=('Arial', 12))
-    monat_text.grid(row=2, column=0)
-    
-    monat_eingabe = tk.Entry(budget_check_frame, width=30, font=("Arial", 12))
-    monat_eingabe.grid(row=2, column=1, padx=10)
-    
-    #Logig der Funktion (wird erst ausgeführt wenn der Kopf gedrückt wurde)
-    def ausfuehren ():
-        
-        jahr = int(jahr_eingabe.get())
-        monat = int(monat_eingabe.get())
-        
-        total_income = 0
-        total_expenses = 0
-        for tran in transaktionsliste:
-            if tran.datum.year == jahr and tran.datum.month == monat:
-                if tran.kategorie == "Einnahme":
-                    total_income += tran.betrag
-                elif tran.kategorie == "Ausgabe":
-                    total_expenses += tran.betrag
-    
-        info = f"Total Einnahmen: {total_income}€, Total Ausgaben: {total_expenses}€ für {jahr}-{monat}"
-    
-        for unterkategorie, budget in budgets.items():
-            spent = sum(tran.betrag for tran in transaktionsliste if tran.unterkategorie == unterkategorie and tran.datum.year == jahr and tran.datum.month == monat)
-            if int(spent) > int(budget):
-                info += f"\n{unterkategorie}: Budget: {budget}€, Ausgaben: {spent}€ für {jahr}-{monat}, Budget überschritten"
-            else:
-                info += f"\n{unterkategorie}: Budget: {budget}€, Ausgaben: {spent}€ für {jahr}-{monat}, Im Budget"
-        
-        tk.messagebox.showinfo("Budget Info", info)
-    
-    #Button führt bei Betätigung Logig der Funktion aus
-    button = tk.Button(budget_check_frame, text="Budget checken", command=ausfuehren)
-    button.grid(row=3, column=1, columnspan=2, pady=10) 
-    
-def budget_ueberwachung():
-    fenster_schließen()
-    
     grafische_auswertungen_frame.pack(fill="both", expand=1)
     
-    def create_budget_comparison_chart():
+    def create_budget_pie_chart():
         if not budgets:
-            tk.messagebox.showinfo("Information", "Es sind keine Budgets festgelegt.")
+            messagebox.showinfo("Information", "Es sind keine Budgets festgelegt.")
             return
         
-        budget_values = []
-        expense_values = []
-        categories = list(budgets.keys())
-        
-        for category in categories:
-            budget_values.append(float(budgets[category]))
-            expenses = sum(
-                t.betrag for t in transaktionsliste
-                if t.kategorie == "Ausgabe" and t.unterkategorie == category
-            )
-            expense_values.append(abs(expenses))
-
-        if not budget_values:
-            tk.messagebox.showinfo("Information", "Keine Ausgaben verfügbar, um ein Diagramm zu erstellen.")
-            return
-
         chart_window = tk.Toplevel()
-        chart_window.title("Budgetüberwachung")
+        chart_window.title("Vergebene Budgets")
 
         fig, ax = plt.subplots()
-        bar_width = 0.35
+
+        ax.pie(budgets.values(), labels=budgets.keys(), autopct='%1.1f%%', startangle=90)
+        ax.axis('equal')  # Gleichmäßige Darstellung
+
+        canvas = FigureCanvasTkAgg(fig, master=chart_window)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+    
+    # Button zur Anzeige des Kreisdiagramms
+    button = tk.Button(grafische_auswertungen_frame, text="Vergebene Budgets anzeigen", command=create_budget_pie_chart)
+    button.grid(row=1, column=0, pady=10)
+
+# Methode zur Überprüfung und Darstellung der Einhaltung der Budgets als Balkendiagramm
+def einhaltung_der_budgets():
+    fenster_schließen()
+    budget_check_frame.pack(fill="both", expand=1)
+
+    jahr_text = tk.Label(budget_check_frame, text="Jahr:", font=('Arial', 12))
+    jahr_text.grid(row=1, column=0)
+
+    jahr_eingabe = tk.Entry(budget_check_frame, width=30, font=("Arial", 12))
+    jahr_eingabe.grid(row=1, column=1, padx=10)
+
+    monat_text = tk.Label(budget_check_frame, text="Monat:", font=('Arial', 12))
+    monat_text.grid(row=2, column=0)
+
+    monat_eingabe = tk.Entry(budget_check_frame, width=30, font=("Arial", 12))
+    monat_eingabe.grid(row=2, column=1, padx=10)
+
+    def ausfuehren():
+    jahr = int(jahr_eingabe.get())
+    monat = int(monat_eingabe.get())
+
+    total_income = 0
+    total_expenses = 0
+    spent_dict = {}
+
+    for tran in transaktionsliste:
+        if tran.datum.year == jahr and tran.datum.month == monat:
+            if tran.kategorie == "Einnahme":
+                total_income += tran.betrag
+            elif tran.kategorie == "Ausgabe":
+                total_expenses += tran.betrag
+                if tran.unterkategorie not in spent_dict:
+                    spent_dict[tran.unterkategorie] = 0
+                spent_dict[tran.unterkategorie] += abs(tran.betrag)
+
+    info = f"Total Einnahmen: {total_income}€, Total Ausgaben: {total_expenses}€ für {jahr}-{monat}"
+
+    for unterkategorie, budget in budgets.items():
+        spent = spent_dict.get(unterkategorie, 0)
+        if int(spent) > int(budget):
+            info += f"\n{unterkategorie}: Budget: {budget}€, Ausgaben: {spent}€ für {jahr}-{monat}, Budget überschritten"
+        else:
+            info += f"\n{unterkategorie}: Budget: {budget}€, Ausgaben: {spent}€ für {jahr}-{monat}, Im Budget"
+
+    tk.messagebox.showinfo("Budget Info", info)
+
+        # Visualisierung als Balkendiagramm
+        chart_window = tk.Toplevel()
+        chart_window.title("Einhaltung der Budgets")
+
+        fig, ax = plt.subplots()
+        categories = list(budgets.keys())
+        budget_values = [budgets[cat] for cat in categories]
+        expense_values = [spent_dict[cat] for cat in categories]
+
+        bar_width = 0.4
         index = range(len(categories))
-        
+
         bars1 = ax.bar(index, budget_values, bar_width, label='Budget')
         bars2 = ax.bar([i + bar_width for i in index], expense_values, bar_width, label='Ausgaben')
 
@@ -352,10 +353,25 @@ def budget_ueberwachung():
         canvas = FigureCanvasTkAgg(fig, master=chart_window)
         canvas.draw()
         canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
+    # Button zur Ausführung der Logik und Anzeige des Diagramms
+    button = tk.Button(budget_check_frame, text="Budget checken", command=ausfuehren)
+    button.grid(row=3, column=1, columnspan=2, pady=10)
+
+# Integration der neuen Methoden in das bestehende Menü oder die GUI
+def grafische_auswertungen():
+    fenster_schließen()
     
-    # Button zur Anzeige des Diagramms
-    button = tk.Button(grafische_auswertungen_frame, text="Budgetüberwachung anzeigen", command=create_budget_comparison_chart)
-    button.grid(row=1, column=0, pady=10)
+    grafische_auswertungen_frame.pack(fill="both", expand=1)
+    
+    # Button zur Anzeige der Vergebenen Budgets
+    button1 = tk.Button(grafische_auswertungen_frame, text="Vergebene Budgets", command=vergebene_budgets)
+    button1.grid(row=1, column=0, pady=10)
+    
+    # Button zur Anzeige der Einhaltung der Budgets
+    button2 = tk.Button(grafische_auswertungen_frame, text="Einhaltung der Budgets", command=einhaltung_der_budgets)
+    button2.grid(row=1, column=1, pady=10)
+
  
 def kontostand_zeitverlauf():
     fenster_schließen()
@@ -684,8 +700,8 @@ reiter_transaktion.add_command(label="Transaktion löschen", command=loeschen_tr
 reiter_transaktion.add_command(label="Transaktion anzeigen", command=anzeigen_transaktionen)
 
 reiter_budget.add_command(label="Budget planen", command=budget_setzen)
-reiter_budget.add_command(label="Budget checken", command=check_budget)
-reiter_budget.add_command(label="Budget überwachen", command=budget_ueberwachung)
+reiter_budget.add_command(label="vergebene Budgets", command=vergebene_budgets)
+reiter_budget.add_command(label="Budget checken", command=einhaltung_der_budgets)
 
 
 reiter_sonstiges.add_command(label="Konten anzeigen", command=kontostand_umsatz)
