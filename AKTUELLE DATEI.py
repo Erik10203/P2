@@ -357,7 +357,51 @@ def budget_ueberwachung():
     button = tk.Button(grafische_auswertungen_frame, text="Budgetüberwachung anzeigen", command=create_budget_comparison_chart)
     button.grid(row=1, column=0, pady=10)
  
+def kontostand_zeitverlauf():
+    fenster_schließen()
+    
+    grafische_auswertungen_frame.pack(fill="both", expand=1)
+    
+    def create_balance_over_time_chart():
+        if not transaktionsliste:
+            tk.messagebox.showinfo("Information", "Es sind keine Transaktionen vorhanden.")
+            return
+        
+        dates = []
+        balances = []
+        current_balance = 0
 
+        sorted_transactions = sorted(transaktionsliste, key=lambda x: x.getDatum())
+
+        for transaction in sorted_transactions:
+            current_balance += transaction.getBetrag()
+            dates.append(transaction.getDatum())
+            balances.append(current_balance)
+
+        if not dates or not balances:
+            tk.messagebox.showinfo("Information", "Keine Daten vorhanden, um ein Diagramm zu erstellen.")
+            return
+
+        chart_window = tk.Toplevel()
+        chart_window.title("Kontostand im Zeitverlauf")
+
+        fig, ax = plt.subplots()
+        ax.plot(dates, balances, marker='o', linestyle='-')
+        
+        ax.set_xlabel('Datum')
+        ax.set_ylabel('Kontostand (€)')
+        ax.set_title('Kontostand im Zeitverlauf')
+        
+        fig.autofmt_xdate(rotation=45)
+        
+        canvas = FigureCanvasTkAgg(fig, master=chart_window)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
+    # Button zur Anzeige des Diagramms
+    button = tk.Button(grafische_auswertungen_frame, text="Kontostand Zeitverlauf anzeigen", command=create_balance_over_time_chart)
+    button.grid(row=1, column=0, pady=10)
+    
 def neue_transaktion_fenster():
     
     #alte fenster schließen
@@ -647,6 +691,7 @@ reiter_budget.add_command(label="Budget überwachen", command=budget_ueberwachun
 reiter_sonstiges.add_command(label="Konten anzeigen", command=kontostand_umsatz)
 reiter_sonstiges.add_command(label="Zeitraumfilter", command=zeitraumfilter)
 reiter_sonstiges.add_command(label="Grafische Auswertungen", command=grafische_auswertungen)
+reiter_sonstiges.add_command(label="Kontostand im Zeitverlauf", command=kontostand_zeitverlauf)
 
 #Menükomponenten in der Menüleiste platzieren
 menuleiste.add_cascade(label="Transaktion", menu=reiter_transaktion)
