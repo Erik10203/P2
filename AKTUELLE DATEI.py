@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Jun 11 21:50:10 2024
+
+@author: joels
+"""
+
 
 import datetime as d
 import tkinter as tk
@@ -297,8 +304,12 @@ def einhaltung_der_budgets():
     monat_eingabe.grid(row=2, column=1, padx=10)
 
     def ausfuehren():
-        jahr = int(jahr_eingabe.get())
-        monat = int(monat_eingabe.get())
+        try:
+            jahr = int(jahr_eingabe.get())
+            monat = int(monat_eingabe.get())
+        except ValueError:
+            messagebox.showerror("Eingabefehler", "Bitte geben Sie gültige Zahlen für Jahr und Monat ein.")
+            return
     
         total_income = 0
         total_expenses = 0
@@ -314,7 +325,7 @@ def einhaltung_der_budgets():
                         spent_dict[tran.unterkategorie] = 0
                     spent_dict[tran.unterkategorie] += abs(tran.betrag)
     
-        info = f"Total Einnahmen: {total_income}€, Total Ausgaben: {total_expenses}€ für {jahr}-{monat}"
+        info = f"Total Einnahmen: {total_income}€, Total Ausgaben: {abs(total_expenses)}€ für {jahr}-{monat}"
     
         for unterkategorie, budget in budgets.items():
             spent = spent_dict.get(unterkategorie, 0)
@@ -323,7 +334,7 @@ def einhaltung_der_budgets():
             else:
                 info += f"\n{unterkategorie}: Budget: {budget}€, Ausgaben: {spent}€ für {jahr}-{monat}, Im Budget"
     
-        tk.messagebox.showinfo("Budget Info", info)
+        messagebox.showinfo("Budget Info", info)
     
         # Visualisierung als Balkendiagramm
         chart_window = tk.Toplevel()
@@ -331,29 +342,38 @@ def einhaltung_der_budgets():
     
         fig, ax = plt.subplots()
         categories = list(budgets.keys())
-        budget_values = [budgets[cat] for cat in categories]
-        expense_values = [spent_dict[cat] for cat in categories]
+        budget_values = [float(budgets[cat]) for cat in categories]
+        expense_values = [spent_dict.get(cat, 0) for cat in categories]
     
-        bar_width = 0.4
+        # Hinzufügen der Gesamteinnahmen und -ausgaben für die Visualisierung
+        categories.append("Total")
+        budget_values.append(0)  # Keine Budgets für Gesamteinnahmen und -ausgaben
+        expense_values.append(abs(total_expenses))  # Ausgaben als positiven Wert
+        income_values = [0] * (len(categories) - 1) + [total_income]
+    
+        bar_width = 0.3
         index = range(len(categories))
     
         bars1 = ax.bar(index, budget_values, bar_width, label='Budget')
         bars2 = ax.bar([i + bar_width for i in index], expense_values, bar_width, label='Ausgaben')
+        bars3 = ax.bar([i + bar_width * 2 for i in index], income_values, bar_width, label='Einnahmen')
     
         ax.set_xlabel('Kategorien')
         ax.set_ylabel('Beträge (€)')
-        ax.set_title('Budget vs. Ausgaben')
-        ax.set_xticks([i + bar_width / 2 for i in index])
+        ax.set_title('Budget vs. Ausgaben vs. Einnahmen')
+        ax.set_xticks([i + bar_width for i in index])
         ax.set_xticklabels(categories)
         ax.legend()
     
-        for bar in bars1 + bars2:
-                yval = bar.get_height()
-                ax.text(bar.get_x() + bar.get_width() / 2, yval + 0.05, round(yval, 2), ha='center', va='bottom')
+        for bar in bars1 + bars2 + bars3:
+            yval = bar.get_height()
+            ax.text(bar.get_x() + bar.get_width() / 2, yval + 0.05, round(yval, 2), ha='center', va='bottom')
     
         canvas = FigureCanvasTkAgg(fig, master=chart_window)
         canvas.draw()
         canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
+
 
     # Button zur Ausführung der Logik und Anzeige des Diagramms
     button = tk.Button(budget_check_frame, text="Budget checken", command=ausfuehren)
