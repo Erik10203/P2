@@ -5,6 +5,7 @@ from tkinter import ttk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
+global transaktionsliste
 transaktionsliste = []
 budgets = {}
 budget = 0
@@ -209,8 +210,6 @@ def budget_setzen():
     
     #Text und Eingabefelder
     
-    auswahl = tk.StringVar()
-    auswahl.set(unterkategorie_liste[0])
     
     welche_kategorie_text = tk.Label(budget_setzen_frame, text="Für welche Kategorie soll ein Budget festgelegt werden?", font=('Arial', 12))
     welche_kategorie_text.grid(row=1, column=0)
@@ -230,7 +229,7 @@ def budget_setzen():
         if not vorhandene_unterkategorien:
             tk.messagebox.showinfo("Info", "Es gibt keine vorhandenen Unterkategorien.")
             return
-        kategorie = auswahl.get()
+        kategorie = welche_kategorie_eingabe.get()
         if kategorie is None or kategorie not in vorhandene_unterkategorien:
             tk.messagebox.showerror("Fehler", f"Die Kategorie '{kategorie}' existiert nicht.")
             return
@@ -534,7 +533,7 @@ def grafische_auswertungen():
 
 
 
-global transaktionsliste
+
 transaktionsliste = Transaktion.transaktion_lesen2()
 
 #Startfenster
