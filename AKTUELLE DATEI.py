@@ -276,8 +276,8 @@ def check_budget():
     #Logig der Funktion (wird erst ausgeführt wenn der Kopf gedrückt wurde)
     def ausfuehren ():
         
-        jahr = jahr_eingabe.get()
-        monat = monat_eingabe.get()
+        jahr = int(jahr_eingabe.get())
+        monat = int(monat_eingabe.get())
         
         total_income = 0
         total_expenses = 0
