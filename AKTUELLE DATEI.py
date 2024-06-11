@@ -388,6 +388,7 @@ def neue_transaktion_fenster():
 
     tk.Label( neue_transaktion_frame, text="Datum (TTMMJJJJ):").grid(row=2, column=0)
     entry_datum = tk.Entry( neue_transaktion_frame)
+    entry_datum.insert(0, d.datetime.now().strftime("%d%m%Y"))
     entry_datum.grid(row=2, column=1)
     
     #Button führt bei Betätigung Logig der Funktion aus
