@@ -727,7 +727,7 @@ reiter_transaktion.add_command(label="Transaktion löschen", command=loeschen_tr
 reiter_transaktion.add_command(label="Transaktion anzeigen", command=anzeigen_transaktionen)
 
 reiter_budget.add_command(label="Budget planen", command=budget_setzen)
-reiter_budget.add_command(label="vergebene Budgets", command=vergebene_budgets)
+reiter_budget.add_command(label="Vergebene Budgets", command=vergebene_budgets)
 reiter_budget.add_command(label="Budget checken", command=einhaltung_der_budgets)
 
 
