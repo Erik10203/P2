@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Jun 11 21:50:10 2024
-
-@author: joels
-"""
 
 
 import datetime as d
@@ -41,12 +35,20 @@ def fenster_schließen():
     for widget in grafische_auswertungen_frame.winfo_children():
         widget.destroy
         
+    for widget in vergebene_budgets_frame.winfo_children():
+        widget.destroy
+        
+    for widget in kontostand_zeitverlauf_frame.winfo_children():
+        widget.destroy
+        
     neue_transaktion_frame.pack_forget()
     transaktion_löschen_frame.pack_forget()
     budget_setzen_frame.pack_forget()
     budget_check_frame.pack_forget()
     zeitraumfilter_frame.pack_forget()
     grafische_auswertungen_frame.pack_forget()    
+    vergebene_budgets_frame.pack_forget()    
+    kontostand_zeitverlauf_frame.pack_forget()
 
 class Transaktion:
     nummerzähler = 0
@@ -263,7 +265,7 @@ def budget_setzen():
 # Methode zur Darstellung der vergebenen Budgets als Kreisdiagramm
 def vergebene_budgets():
     fenster_schließen()
-    grafische_auswertungen_frame.pack(fill="both", expand=1)
+    vergebene_budgets_frame.pack(fill="both", expand=1)
     
     def create_budget_pie_chart():
         if not budgets:
@@ -283,7 +285,7 @@ def vergebene_budgets():
         canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
     
     # Button zur Anzeige des Kreisdiagramms
-    button = tk.Button(grafische_auswertungen_frame, text="Vergebene Budgets anzeigen", command=create_budget_pie_chart)
+    button = tk.Button(vergebene_budgets_frame, text="Vergebene Budgets anzeigen", command=create_budget_pie_chart)
     button.grid(row=1, column=0, pady=10)
 
 # Methode zur Überprüfung und Darstellung der Einhaltung der Budgets als Balkendiagramm
@@ -397,7 +399,7 @@ def grafische_auswertungen():
 def kontostand_zeitverlauf():
     fenster_schließen()
     
-    grafische_auswertungen_frame.pack(fill="both", expand=1)
+    kontostand_zeitverlauf_frame.pack(fill="both", expand=1)
     
     def create_balance_over_time_chart():
         if not transaktionsliste:
@@ -436,7 +438,7 @@ def kontostand_zeitverlauf():
         canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
 
     # Button zur Anzeige des Diagramms
-    button = tk.Button(grafische_auswertungen_frame, text="Kontostand Zeitverlauf anzeigen", command=create_balance_over_time_chart)
+    button = tk.Button(kontostand_zeitverlauf_frame, text="Kontostand Zeitverlauf anzeigen", command=create_balance_over_time_chart)
     button.grid(row=1, column=0, pady=10)
     
 def neue_transaktion_fenster():
@@ -749,6 +751,8 @@ budget_setzen_frame = tk.Frame(root, width=800, height=800)
 budget_check_frame = tk.Frame(root, width=800, height=800)
 zeitraumfilter_frame = tk.Frame(root, width=800, height=800)
 grafische_auswertungen_frame = tk.Frame(root, width=800, height=800)
+vergebene_budgets_frame = tk.Frame(root, width=800, height=800)
+kontostand_zeitverlauf_frame = tk.Frame(root, width=800, height=800)
 
 Transaktion.transaktion_lesen2()
 root.mainloop()
