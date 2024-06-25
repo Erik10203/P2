@@ -1,0 +1,18 @@
+def anzeigen_transaktionen():
+    transactions_window = tk.Toplevel()
+    transactions_window.title("Transaktionen anzeigen")
+
+    tree = ttk.Treeview(transactions_window, columns=("Nummer", "Betrag", "Kategorie", "Unterkategorie", "Datum"), show="headings")
+    tree.heading("Nummer", text="Nummer")
+    tree.heading("Betrag", text="Betrag")
+    tree.heading("Kategorie", text="Kategorie")
+    tree.heading("Unterkategorie", text="Unterkategorie")
+    tree.heading("Datum", text="Datum")
+
+    # Sortieren nahc Datum
+    sorted_transaktionsliste = sorted(transaktionsliste, key=lambda x: x.getDatum())
+
+    for transaktion in sorted_transaktionsliste:
+        tree.insert("", tk.END, values=(transaktion.getNummer(), transaktion.getBetrag(), transaktion.getKategorie(), transaktion.getUnterkategorie(), transaktion.getDatum().strftime('%d.%m.%Y')))
+
+    tree.pack(fill=tk.BOTH, expand=True)
